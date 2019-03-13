@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="56dp"
+    android:layout_height="126dp"
+    android:orientation="vertical"
+   >
+    <TextView
+        android:layout_marginTop="5dp"
+        android:alpha="0.8"
+        android:textColor="@color/white"
+        android:id="@+id/tv_hour"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="12"
+        android:textSize="20sp"/>
+    <ImageView
+        android:id="@+id/img_icon_item_weather"
+        android:padding="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/common_google_signin_btn_icon_dark"/>
+
+    <TextView
+        android:alpha="0.8"
+        android:textColor="@color/white"
+        android:id="@+id/tv_temp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center_horizontal"
+        android:text="12 C"
+        android:textSize="20sp" />
+
+
+</LinearLayout>
