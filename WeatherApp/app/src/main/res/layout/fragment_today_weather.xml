@@ -3,28 +3,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v4.widget.ContentLoadingProgressBar
-        android:id="@+id/loading"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="visible" />
+    <!--<android.support.v4.widget.ContentLoadingProgressBar-->
+        <!--android:id="@+id/loading"-->
+        <!--style="?android:attr/progressBarStyleLarge"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:visibility="visible" />-->
 
     <ImageView
+        android:src="@drawable/clear_day"
         android:id="@+id/background_image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"/>
     <RelativeLayout
+        android:id="@+id/space"
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+        android:layout_height="45dp" >
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:alpha="0.5"
+            android:background="@color/white"></View>
+    </RelativeLayout>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:layout_above="@id/space"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/refresh_layout"
+        >
         <ScrollView
             android:id="@+id/scrollView_1"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -32,12 +45,13 @@
 
 
                 <LinearLayout
-                    android:id="@+id/tv_1"
+                    android:id="@+id/liner_layout_1"
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
                     android:orientation="vertical">
 
                     <TextView
+                        android:singleLine="true"
                         android:id="@+id/tv_city_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -59,7 +73,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/tv_2"
+                    android:id="@+id/liner_layout_2"
                     android:layout_width="match_parent"
                     android:layout_height="130dp"
                     android:orientation="vertical">
@@ -89,7 +103,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/tv_3"
+                    android:id="@+id/liner_layout_3"
                     android:layout_width="match_parent"
                     android:layout_height="130dp"
                     android:orientation="vertical">
@@ -393,6 +407,6 @@
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
-    </RelativeLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

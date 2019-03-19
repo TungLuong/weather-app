@@ -1,5 +1,6 @@
 package tl.com.weatherapp.adapter;
 
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -36,7 +37,9 @@ public class ItemHourlyWeatherAdapter extends RecyclerView.Adapter<ItemHourlyWea
     @Override
     public void onBindViewHolder(@NonNull ItemHourlyViewHolder holder, int position) {
         if (position == 0){
+            holder.tvHour.setTypeface(null, Typeface.BOLD);
             holder.tvHour.setAlpha(1.0f);
+            holder.tvTemp.setTypeface(null, Typeface.BOLD);
             holder.tvTemp.setAlpha(1.0f);
             holder.tvHour.setText("now");
         }else {

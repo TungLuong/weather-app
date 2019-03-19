@@ -1,16 +1,23 @@
 package tl.com.weatherapp;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,27 +32,21 @@ import android.widget.Toast;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Retrofit;
 import tl.com.weatherapp.adapter.ItemDailyWeatherAdapter;
 import tl.com.weatherapp.adapter.ItemHourlyWeatherAdapter;
 import tl.com.weatherapp.common.Common;
 import tl.com.weatherapp.model.WeatherResult;
-import tl.com.weatherapp.retrofit.IOpenWeatherMap;
-import tl.com.weatherapp.retrofit.RetrofitClient;
 
 import static tl.com.weatherapp.common.Common.ACTION_SEND_REQUEST_FROM_FRAGMENT;
 import static tl.com.weatherapp.common.Common.ACTION_SEND_RESPONSE_FROM_WIDGET;
 import static tl.com.weatherapp.common.Common.convertUnixToDate;
 
 
-public class TodayWeatherFragment extends Fragment {
+public class WeatherFragment extends Fragment {
 
-    static TodayWeatherFragment instance;
+    static WeatherFragment instance;
 
+    private SwipeRefreshLayout refreshLayout;
     private RoundedImageView imgWeather;
     private ImageView iconWeather;
     private TextView tvCityName, tvHumidity, tvPressure, tvTemperature, tvDateTime, tvWindSpeed, tvDescription, tvDewPoint, tvCloudCover, tvUVIndex, tvVisibility, tvOzone;
@@ -56,21 +56,37 @@ public class TodayWeatherFragment extends Fragment {
     private NestedScrollView scrollView2;
     private LinearLayout linearLayout;
     private LinearLayout weatherPanel;
-    private ProgressBar loading;
+    //private ProgressBar loading;
     private ImageView background;
+
+    private AlertDialog dialogInternet;
 
     private BroadcastReceiver UIBroadcastReceiver;
 
-    public TodayWeatherFragment() {
+    private WeatherResult weatherResult;
+    private int countAddress;
 
+    public WeatherFragment() {
     }
 
-    public static TodayWeatherFragment getInstance() {
-        if (instance == null) {
-            instance = new TodayWeatherFragment();
-        }
-        return instance;
+    @SuppressLint("ValidFragment")
+    public WeatherFragment(WeatherResult weatherResult,int countAddress) {
+        this.weatherResult = weatherResult;
+        this.countAddress = countAddress;
     }
+
+    //    public WeatherFragment() {
+//
+//    }
+//
+//    public static WeatherFragment getInstance() {
+//        if (instance == null) {
+//            instance = new WeatherFragment();
+//        }
+//        return instance;
+//    }
+
+
 
 
     @Override
@@ -86,8 +102,8 @@ public class TodayWeatherFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_today_weather, container, false);
 
-        loading = view.findViewById(R.id.loading);
 
+        // loading = view.findViewById(R.id.loading);
         background = view.findViewById(R.id.background_image_view);
         tvCityName = view.findViewById(R.id.tv_city_name);
         tvHumidity = view.findViewById(R.id.tv_humidity);
@@ -105,9 +121,9 @@ public class TodayWeatherFragment extends Fragment {
         rcvDaily = view.findViewById(R.id.rcv_daily);
         rcvHourly = view.findViewById(R.id.rcv_hourly);
 
-        tv1 = view.findViewById(R.id.tv_1);
-        tv2 = view.findViewById(R.id.tv_2);
-        tv3 = view.findViewById(R.id.tv_3);
+        tv1 = view.findViewById(R.id.liner_layout_1);
+        tv2 = view.findViewById(R.id.liner_layout_2);
+        tv3 = view.findViewById(R.id.liner_layout_3);
 //        listView = findViewById(R.id.list_item);
 //        List<String> modelList = new ArrayList<>();
 //        for (int i = 0; i < 5; i++) {
@@ -117,7 +133,7 @@ public class TodayWeatherFragment extends Fragment {
 //        ArrayAdapter adapter = new ArrayAdapter(this, R.layout.item_view, modelList);
 //        listView.setAdapter(adapter);
         scrollView1 = view.findViewById(R.id.scrollView_1);
-        scrollView1.setVisibility(View.INVISIBLE);
+        //scrollView1.setVisibility(View.INVISIBLE);
         scrollView2 = view.findViewById(R.id.scrollView_2);
         linearLayout = view.findViewById(R.id.linear);
         scrollView1.setOnScrollChangeListener(new View.OnScrollChangeListener() {
@@ -146,33 +162,37 @@ public class TodayWeatherFragment extends Fragment {
             }
         });
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_SEND_RESPONSE_FROM_WIDGET);
-        UIBroadcastReceiver = new BroadcastReceiver() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
+        refreshLayout = view.findViewById(R.id.refresh_layout);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onReceive(Context context, Intent intent) {
-                if(intent.getAction().equals(ACTION_SEND_RESPONSE_FROM_WIDGET)){
-                    getWeatherInfo((WeatherResult) intent.getSerializableExtra(ACTION_SEND_RESPONSE_FROM_WIDGET));
-                }
+            public void onRefresh() {
+                refreshLayout.setRefreshing(true);
+                ((MainActivity)getActivity()).getIsReceiver().set(countAddress,false);
+                ((MainActivity)getActivity()).sendRequestGetWeatherInfo(countAddress);
+
             }
-        };
-
-        getContext().registerReceiver(UIBroadcastReceiver,filter);
-        sendRequestGetWeatherInfo();
+        });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getWeatherInfo(weatherResult);
+        }
+        refreshLayout.setRefreshing(false);
         return view;
-    }
-
-    private void sendRequestGetWeatherInfo() {
-        Intent intent = new Intent(getContext(),WeatherWidget.class);
-        intent.setAction(ACTION_SEND_REQUEST_FROM_FRAGMENT);
-        getContext().sendBroadcast(intent);
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void getWeatherInfo(WeatherResult weatherResult){
-        String icon_name = weatherResult.getCurrently().getIcon().replace('-','_');
+    private void getWeatherInfo(WeatherResult weatherResult) {
+        if (weatherResult == null){
+            refreshLayout.setRefreshing(true);
+            Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getContext().getPackageName() + "/drawable/" + "blue_sky_2");
+            Picasso.get()
+                    .load(uri)
+                    .fit()
+                    .into(background);
+
+            return;
+        }
+        String icon_name = weatherResult.getCurrently().getIcon().replace('-', '_');
         Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getActivity().getPackageName() + "/drawable/" + icon_name);
         Picasso.get()
                 .load(uri)
@@ -194,8 +214,9 @@ public class TodayWeatherFragment extends Fragment {
         rcvDaily.setAdapter(itemDailyWeatherAdapter);
 
         // load information
-
-        tvCityName.setText("unknown where");
+        if (weatherResult.getAddress() == null) {
+            tvCityName.setText("unknown where");
+        }else tvCityName.setText(weatherResult.getAddress());
 
 
         tvDateTime.setText(convertUnixToDate(weatherResult.getCurrently().getTime()) + "");
@@ -211,23 +232,18 @@ public class TodayWeatherFragment extends Fragment {
         tvOzone.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getOzone())).append(""));
 
         // display
-        scrollView1.setVisibility(View.VISIBLE);
-        loading.setVisibility(View.GONE);
+        //scrollView1.setVisibility(View.VISIBLE);
+        //loading.setVisibility(View.GONE);
+
+    }
+
+    public void isDisConnected(){
+        refreshLayout.setRefreshing(true);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-    }
-
-    private boolean canScroll(ScrollView scrollView){
-        View child = (View) scrollView.getChildAt(0);
-        if(child != null){
-            int childHeight = child.getHeight();
-            int x = scrollView.getHeight();
-            return scrollView.getHeight() < childHeight + scrollView.getPaddingTop()+ scrollView.getPaddingBottom();
-        }
-        return false;
     }
 }
 

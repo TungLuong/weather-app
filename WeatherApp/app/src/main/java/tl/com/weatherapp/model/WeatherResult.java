@@ -13,6 +13,7 @@ public class WeatherResult implements Serializable {
     private Daily daily ;
     private Flags flags ;
     private double offset ;
+    private String address;
 
     public double getLatitude() {
         return latitude;
@@ -84,5 +85,13 @@ public class WeatherResult implements Serializable {
 
     public void setOffset(double offset) {
         this.offset = offset;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

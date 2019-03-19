@@ -1,8 +1,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="@dimen/widget_margin">
     <LinearLayout
+        android:id="@+id/linear_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -20,6 +22,38 @@
             android:layout_toLeftOf="@id/tv_temp"
             android:layout_width="56dp"
             android:layout_height="56dp" />
+    </LinearLayout>
+    <TextView
+        android:layout_centerInParent="true"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_time_update"
+        android:layout_below="@id/linear_layout"
+        android:text="last update : "
+        />
+
+    <LinearLayout
+        android:layout_below="@id/tv_time_update"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/is_location_enable"
+            android:layout_gravity="center_vertical"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:src="@drawable/ic_location_white_24dp" />
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_location"
+            android:layout_below="@id/tv_time_update"
+            android:text="Lai Xa"
+            />
     </LinearLayout>
 
 </RelativeLayout>
