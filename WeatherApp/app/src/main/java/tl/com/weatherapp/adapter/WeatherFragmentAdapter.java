@@ -1,52 +1,21 @@
 package tl.com.weatherapp.adapter;
 
-import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.Uri;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import tl.com.weatherapp.R;
 import tl.com.weatherapp.WeatherFragment;
-import tl.com.weatherapp.common.Common;
 import tl.com.weatherapp.model.WeatherResult;
-
-import static tl.com.weatherapp.common.Common.ACTION_SEND_RESPONSE_FROM_WIDGET;
-import static tl.com.weatherapp.common.Common.convertUnixToDate;
 
 public class WeatherFragmentAdapter extends FragmentStatePagerAdapter {
 
     List<WeatherResult> weatherResultList = new ArrayList<>();
-    FragmentManager fragmentManager;
+
     public WeatherFragmentAdapter(FragmentManager fm) {
         super(fm);
-        fragmentManager = fm;
     }
 
     public List<WeatherResult> getWeatherResultList() {
@@ -127,7 +96,7 @@ public class WeatherFragmentAdapter extends FragmentStatePagerAdapter {
 //        //tao ra item view
 //        LayoutInflater inflate = LayoutInflater.from(container.getContext());
 //        View itemView =
-//                inflate.inflate(R.layout.fragment_today_weather,
+//                inflate.inflate(R.layout.fragment_weather,
 //                        container, false);
 //        //anh xa cac view trong itemview
 //        initView(itemView);

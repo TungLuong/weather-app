@@ -13,18 +13,14 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -44,9 +40,8 @@ import tl.com.weatherapp.model.WeatherResult;
 import tl.com.weatherapp.retrofit.IOpenWeatherMap;
 import tl.com.weatherapp.retrofit.RetrofitClient;
 
-import static android.widget.Toast.LENGTH_SHORT;
 import static tl.com.weatherapp.common.Common.ACTION_SEND_REQUEST_FROM_FRAGMENT;
-import static tl.com.weatherapp.common.Common.ACTION_SEND_RESPONSE_FROM_WIDGET;
+import static tl.com.weatherapp.common.Common.ACTION_RECEIVER_RESPONSE_FROM_WIDGET;
 
 /**
  * Implementation of App Widget functionality.
@@ -120,7 +115,7 @@ public class WeatherWidget extends AppWidgetProvider {
                     public void accept(WeatherResult weatherResult) throws Exception {
                         weatherResult.setAddress(address);
                         Intent local = new Intent();
-                        local.setAction(ACTION_SEND_RESPONSE_FROM_WIDGET);
+                        local.setAction(ACTION_RECEIVER_RESPONSE_FROM_WIDGET);
                         local.putExtra(Common.COUNT_ADDRESS, countAddress);
                         local.putExtra(Common.WEATHER_RESULT, weatherResult);
                         context.sendBroadcast(local);
@@ -132,7 +127,7 @@ public class WeatherWidget extends AppWidgetProvider {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         Intent local = new Intent();
-                        local.setAction(ACTION_SEND_RESPONSE_FROM_WIDGET);
+                        local.setAction(ACTION_RECEIVER_RESPONSE_FROM_WIDGET);
                         local.putExtra(Common.COUNT_ADDRESS, countAddress);
                         local.putExtra(Common.WEATHER_RESULT, (Bundle) null);
                         context.sendBroadcast(local);

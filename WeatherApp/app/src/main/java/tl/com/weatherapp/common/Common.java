@@ -18,7 +18,7 @@ public class Common {
 
     //    public static Location current_location = new Location("");
     public static String ACTION_SEND_REQUEST_FROM_FRAGMENT = "ACTION_SEND_REQUEST_FROM_FRAGMENT";
-    public static String ACTION_SEND_RESPONSE_FROM_WIDGET = "ACTION_SEND_RESPONSE_FROM_WIDGET";
+    public static String ACTION_RECEIVER_RESPONSE_FROM_WIDGET = "ACTION_RECEIVER_RESPONSE_FROM_WIDGET";
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static String convertUnixToDate(int dt) {

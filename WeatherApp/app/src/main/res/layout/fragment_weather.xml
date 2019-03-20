@@ -51,7 +51,12 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:scrollHorizontally="true"
                         android:singleLine="true"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
                         android:id="@+id/tv_city_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

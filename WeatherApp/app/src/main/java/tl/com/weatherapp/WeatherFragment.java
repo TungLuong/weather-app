@@ -4,16 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
@@ -27,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
@@ -37,8 +29,6 @@ import tl.com.weatherapp.adapter.ItemHourlyWeatherAdapter;
 import tl.com.weatherapp.common.Common;
 import tl.com.weatherapp.model.WeatherResult;
 
-import static tl.com.weatherapp.common.Common.ACTION_SEND_REQUEST_FROM_FRAGMENT;
-import static tl.com.weatherapp.common.Common.ACTION_SEND_RESPONSE_FROM_WIDGET;
 import static tl.com.weatherapp.common.Common.convertUnixToDate;
 
 
@@ -100,7 +90,7 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_today_weather, container, false);
+        View view = inflater.inflate(R.layout.fragment_weather, container, false);
 
 
         // loading = view.findViewById(R.id.loading);
