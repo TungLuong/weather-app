@@ -24,6 +24,7 @@ public class WeatherHomeFragment extends BaseFragment {
 
 
     private ViewPager viewPager;
+    private int curPositionPager = 0;
     private CircleIndicator indicator;
     private ImageView btnOpenWeatherAddressActivity;
 
@@ -59,6 +60,7 @@ public class WeatherHomeFragment extends BaseFragment {
         indicator = view.findViewById(R.id.circle_indicator);
         indicator.setViewPager(viewPager);
         adapter.registerDataSetObserver(indicator.getDataSetObserver());
+        viewPager.setCurrentItem(curPositionPager);
 
         btnOpenWeatherAddressActivity = view.findViewById(R.id.btn_open_weather_address_activity);
         btnOpenWeatherAddressActivity.setOnClickListener(new View.OnClickListener() {
@@ -81,5 +83,13 @@ public class WeatherHomeFragment extends BaseFragment {
     @Override
     public void onBackPressed() {
         ((MainActivity)getActivity()).showDialogDelete();
+    }
+
+    public WeatherFragmentAdapter getAdapter() {
+        return adapter;
+    }
+
+    public void setCurPositionPager(int curPositionPager) {
+        this.curPositionPager = curPositionPager;
     }
 }

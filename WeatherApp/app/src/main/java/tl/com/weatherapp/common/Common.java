@@ -10,11 +10,12 @@ import java.util.Date;
 public class Common {
     public static final String WEATHER_API_KEY = "015f333c2ca5576208dd63d15a91c5ba";
     public static final String GOOGLE_MAP_API_KEY = "AIzaSyAsvRrYBZ770RpBDQNsbaOCsz3XZjD9Vc8";
-    public static final String COUNT_ADDRESS = "COUNT_ADDRESS" ;
+    public static final String ADDRESS_ID = "ADDRESS_ID" ;
     public static final String WEATHER_RESULT = "WEATHER_RESULT";
     public static final String DATA = "DATA";
-    public static final int COUNT_CURRENT_ADDRESS = 0;
+    public static final int CURRENT_ADDRESS_ID = 0;
     public static final String LIST_WEATHER_RESULT = "LIST_WEATHER_RESULT";
+    public static final String ACTION_UPDATE_CONFIG_WEATHER = "ACTION_UPDATE_CONFIG_WEATHER";
 
     //    public static Location current_location = new Location("");
     public static String ACTION_SEND_REQUEST_FROM_FRAGMENT = "ACTION_SEND_REQUEST_FROM_FRAGMENT";

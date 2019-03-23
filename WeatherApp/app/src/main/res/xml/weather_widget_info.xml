@@ -7,4 +7,6 @@
     android:previewImage="@drawable/example_appwidget_preview"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="3600000"
-    android:widgetCategory="home_screen"></appwidget-provider>
+    android:widgetCategory="home_screen"
+    android:configure="tl.com.weatherapp.WidgetConfigActivity"
+   ></appwidget-provider>

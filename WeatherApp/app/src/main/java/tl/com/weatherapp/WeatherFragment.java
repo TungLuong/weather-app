@@ -210,7 +210,7 @@ public class WeatherFragment extends Fragment {
 
 
         tvDateTime.setText(convertUnixToDate(weatherResult.getCurrently().getTime()) + "");
-        tvHumidity.setText(weatherResult.getCurrently().getHumidity() + "%");
+        tvHumidity.setText(weatherResult.getCurrently().getHumidity()*100 + "%");
         tvPressure.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getPressure())).append(" hPa"));
         tvTemperature.setText(new StringBuilder(String.valueOf(Common.covertFtoC(weatherResult.getCurrently().getTemperature()))).append("˚"));
         tvWindSpeed.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getWindSpeed())).append("m/s"));

@@ -10,7 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.daimajia.swipe.SwipeLayout;
+import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -20,11 +23,12 @@ import tl.com.weatherapp.R;
 import tl.com.weatherapp.common.Common;
 import tl.com.weatherapp.model.WeatherResult;
 
-public class ItemWeatherAddressAdapter extends RecyclerView.Adapter<ItemWeatherAddressAdapter.ItemWeatherAddressViewHolder> {
+public class ItemWeatherAddressAdapter extends RecyclerSwipeAdapter<ItemWeatherAddressAdapter.ItemWeatherAddressViewHolder> {
 
     private List<WeatherResult> weatherResultList;
     private Context mContext;
     private IListenerDelete iListenerDelete;
+
     public ItemWeatherAddressAdapter(List<WeatherResult> weatherResultList, Context mContext, IListenerDelete iListenerDelete) {
         this.weatherResultList = weatherResultList;
         this.mContext = mContext;
@@ -42,33 +46,46 @@ public class ItemWeatherAddressAdapter extends RecyclerView.Adapter<ItemWeatherA
     public void onBindViewHolder(@NonNull final ItemWeatherAddressViewHolder holder, final int position) {
 
         if (weatherResultList.get(position) == null) return;
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (holder.btnDelete.getVisibility() == View.VISIBLE && position != Common.COUNT_CURRENT_ADDRESS ){
-                    holder.btnDelete.setVisibility(View.GONE);
-                }else if (holder.btnDelete.getVisibility() == View.GONE && position != Common.COUNT_CURRENT_ADDRESS){
-                    holder.btnDelete.setVisibility(View.VISIBLE);
-                }
-                return true;
-            }
-        });
-
+        holder.swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
+        if (position == 0) {
+            holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Right, null);
+        }else {
+            holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Right, holder.swipeLayout.findViewById(R.id.bottom_wraper));
+        }
+//        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                if (holder.btnDelete.getVisibility() == View.VISIBLE && position != Common.CURRENT_ADDRESS_ID ){
+//                    holder.btnDelete.setVisibility(View.GONE);
+//                }else if (holder.btnDelete.getVisibility() == View.GONE && position != Common.CURRENT_ADDRESS_ID){
+//                    holder.btnDelete.setVisibility(View.VISIBLE);
+//                }
+//                return true;
+//            }
+//        });
+//
         holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iListenerDelete.deleteItem(position);
+                mItemManger.removeShownLayouts(holder.swipeLayout);
+                if(position == Common.CURRENT_ADDRESS_ID){
+                    Toast.makeText(mContext,"Cannot remove location",Toast.LENGTH_SHORT).show();
+                    notifyDataSetChanged();
+                }else {
+                    iListenerDelete.deleteItem(position);
+                }
+                mItemManger.closeAllItems();
             }
         });
-        String icon_name = weatherResultList.get(position).getCurrently().getIcon().replace('-', '_');
+        String icon_name = weatherResultList.get(position).getCurrently().getIcon().replace('-', '_')+"_compact";
         Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + mContext.getPackageName() + "/drawable/" + icon_name);
         Picasso.get()
                 .load(uri)
                 .fit()
                 .into(holder.background);
-        if(position == 0){
+        if (position == 0) {
             holder.icLocation.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             holder.icLocation.setVisibility(View.GONE);
         }
 
@@ -84,12 +101,19 @@ public class ItemWeatherAddressAdapter extends RecyclerView.Adapter<ItemWeatherA
         }
         holder.tvTimeLastUpdate.setText(lastTimeUpdate);
 
+        mItemManger.bindView(holder.itemView, position);
+
     }
 
     @Override
     public int getItemCount() {
         if (weatherResultList == null) return 0;
         return weatherResultList.size();
+    }
+
+    @Override
+    public int getSwipeLayoutResourceId(int position) {
+        return R.id.swipe;
     }
 
     public class ItemWeatherAddressViewHolder extends RecyclerView.ViewHolder {
@@ -100,8 +124,11 @@ public class ItemWeatherAddressAdapter extends RecyclerView.Adapter<ItemWeatherA
         private ImageView icWeather;
         private TextView tvTemp;
         private TextView btnDelete;
+        public SwipeLayout swipeLayout;
+
         public ItemWeatherAddressViewHolder(View itemView) {
             super(itemView);
+            swipeLayout = itemView.findViewById(R.id.swipe);
             background = itemView.findViewById(R.id.background);
             tvAddress = itemView.findViewById(R.id.tv_address);
             tvTimeLastUpdate = itemView.findViewById(R.id.tv_time_update);

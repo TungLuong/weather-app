@@ -1,92 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:padding="2dp"
-    android:elevation="10dp"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipe"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-   >
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/background"
-        android:scaleType="matrix"/>
+    android:padding="2dp"
+    app:leftEdgeSwipeOffset="0dp"
+    app:rightEdgeSwipeOffset="0dp"
+    android:orientation="vertical">
     <LinearLayout
-        android:layout_marginRight="0dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:id="@+id/linear_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:id="@+id/bottom_wraper"
+        android:layout_width="100dp"
+        android:weightSum="1"
         android:orientation="horizontal"
-        >
+        android:layout_height="match_parent">
+
         <TextView
-            android:gravity="center"
-            android:id="@+id/tv_temp"
-            android:layout_gravity="center_vertical"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:text="20"
-            android:textSize="60dp"
-            android:layout_marginRight="20dp"/>
-        <ImageView
-            android:visibility="gone"
-            android:layout_marginLeft="10dp"
-            android:src="@mipmap/ic_launcher"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/img_icon"
-            android:layout_toLeftOf="@id/tv_temp"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            />
-        <TextView
-            android:visibility="gone"
-            android:background="@color/red"
-            android:textColor="@color/black"
-            android:text="Delete"
-            android:textSize="20dp"
-            android:gravity="center"
             android:id="@+id/btn_delete"
-            android:layout_alignParentRight="true"
-            android:layout_width="70dp"
-            android:layout_height="100dp" />
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#ff0000"
+            android:gravity="center"
+            android:text="Delete"
+            android:textColor="#fff"/>
+
     </LinearLayout>
+
     <LinearLayout
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"
-        android:id="@+id/location"
-        android:layout_marginLeft="10dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <TextView
-            android:singleLine="true"
-            android:textSize="25dp"
-            android:textColor="@color/white"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/tv_address"
-            android:text="Lai Xa"
-            />
-        <ImageView
-            android:layout_marginLeft="10dp"
-            android:id="@+id/is_location_enable"
-            android:layout_gravity="center_vertical"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_location_white_24dp" />
-    </LinearLayout>
-    <TextView
-        android:textSize="15dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="5dp"
-        android:layout_above="@id/location"
-        android:textColor="@color/white"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_time_update"
-        android:text="last update : "
-        />
 
-</RelativeLayout>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="100dp">
+
+            <ImageView
+                android:background="@drawable/blue_sky_2"
+                android:id="@+id/background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="matrix" />
+
+            <LinearLayout
+                android:id="@+id/linear_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="0dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_temp"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="30dp"
+                    android:gravity="center"
+                    android:text="20"
+                    android:textColor="@color/white"
+                    android:textSize="60dp" />
+
+                <ImageView
+                    android:layout_marginRight="20dp"
+                    android:id="@+id/img_icon"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toLeftOf="@id/tv_temp"
+                    android:src="@mipmap/ic_launcher"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="20dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_address"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="Lai Xa"
+                    android:textColor="@color/white"
+                    android:textSize="25dp" />
+
+                <ImageView
+                    android:id="@+id/is_location_enable"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/ic_location_white_24dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_time_update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/location"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="5dp"
+                android:text="last update : "
+                android:textColor="@color/white"
+                android:textSize="15dp" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</com.daimajia.swipe.SwipeLayout>

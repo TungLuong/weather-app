@@ -62,11 +62,11 @@ public class FindAddressFragment extends BaseFragment implements PlaceSelectionL
     public void onPlaceSelected(Place place) {
         LatLng latLng = place.getLatLng();
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Common.DATA, MODE_PRIVATE);
-        int totalAddress = sharedPreferences.getInt("TOTAL_ADDRESS", 0);
+        int totalAddress = sharedPreferences.getInt("TOTAL_ADDRESS", 1);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putFloat("LAT" + totalAddress, (float) latLng.latitude);
         editor.putFloat("LNG" + totalAddress, (float) latLng.longitude);
-        editor.putString("ADDRESS" + totalAddress, String.valueOf(place.getName()));
+        editor.putString("ADDRESS_NAME" + totalAddress, String.valueOf(place.getName()));
         editor.remove("TOTAL_ADDRESS");
         editor.putInt("TOTAL_ADDRESS", totalAddress + 1);
         editor.commit();

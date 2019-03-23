@@ -30,12 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tl.com.weatherapp.base.BaseActivity;
-import tl.com.weatherapp.base.BaseFragment;
 import tl.com.weatherapp.common.Common;
 import tl.com.weatherapp.model.WeatherResult;
 
 import static tl.com.weatherapp.common.Common.ACTION_SEND_REQUEST_FROM_FRAGMENT;
 import static tl.com.weatherapp.common.Common.ACTION_RECEIVER_RESPONSE_FROM_WIDGET;
+import static tl.com.weatherapp.common.Common.CURRENT_ADDRESS_ID;
 
 public class MainActivity extends BaseActivity {
 
@@ -45,6 +45,7 @@ public class MainActivity extends BaseActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     private int totalAddress = 0;
+    private int positionPager = CURRENT_ADDRESS_ID;
     List<WeatherResult> listWeatherResults = new ArrayList<>();
     List<Boolean> isReceiver = new ArrayList<>();
 
@@ -53,9 +54,13 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            positionPager = extras.getInt("ADDRESS_ID");
+        }
         setContentView(R.layout.activity_main);
-        sharedPreferences = getSharedPreferences(Common.DATA,MODE_PRIVATE);
-        totalAddress = sharedPreferences.getInt("TOTAL_ADDRESS",1);
+        sharedPreferences = getSharedPreferences(Common.DATA, MODE_PRIVATE);
+        totalAddress = sharedPreferences.getInt("TOTAL_ADDRESS", 1);
         //Request permission
         Dexter.withActivity(this).withPermissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
                 .withListener(new MultiplePermissionsListener() {
@@ -70,6 +75,7 @@ public class MainActivity extends BaseActivity {
                             init();
                         }
                     }
+
                     @Override
                     public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
                     }
@@ -92,18 +98,17 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(ACTION_RECEIVER_RESPONSE_FROM_WIDGET)) {
-                     WeatherResult weatherResult = ( WeatherResult ) intent.getSerializableExtra(Common.WEATHER_RESULT);
-                     int countAddress = intent.getIntExtra(Common.COUNT_ADDRESS,0);
-                     if(!isReceiver.get(countAddress)) {
-                         isReceiver.set(countAddress,true);
-                         listWeatherResults.set(countAddress, weatherResult);
-                         if(countAddress == Common.COUNT_CURRENT_ADDRESS)
-                         {
-                             openWeatherHomeFragment();
-                         }
-                         checkWeatherAddressFragmentVisible();
+                    WeatherResult weatherResult = (WeatherResult) intent.getSerializableExtra(Common.WEATHER_RESULT);
+                    int addressID = intent.getIntExtra(Common.ADDRESS_ID, 0);
+                    if (!isReceiver.get(addressID)) {
+                        isReceiver.set(addressID, true);
+                        listWeatherResults.set(addressID, weatherResult);
+                        if (addressID == positionPager) {
+                            openWeatherHomeFragment(positionPager);
+                        }
+                        checkFragmentVisible(addressID);
 
-                     }
+                    }
 
 
                 } else if (intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
@@ -113,7 +118,7 @@ public class MainActivity extends BaseActivity {
                         }
                         listWeatherResults = new ArrayList<>();
                         isReceiver = new ArrayList<>();
-                        for(int i = 0; i< totalAddress ; i++) {
+                        for (int i = 0; i < totalAddress; i++) {
                             listWeatherResults.add(null);
                             isReceiver.add(false);
                             sendRequestGetWeatherInfo(i);
@@ -124,24 +129,30 @@ public class MainActivity extends BaseActivity {
             }
         };
         registerReceiver(UIBroadcastReceiver, filter);
-        listWeatherResults = new ArrayList<>();
-        isReceiver = new ArrayList<>();
-        for(int i = 0; i< totalAddress ; i++) {
-            listWeatherResults.add(null);
-            isReceiver.add(false);
-            sendRequestGetWeatherInfo(i);
-        }
+//        listWeatherResults = new ArrayList<>();
+//        isReceiver = new ArrayList<>();
+//        for (int i = 0; i < totalAddress; i++) {
+//            listWeatherResults.add(null);
+//            isReceiver.add(false);
+//            sendRequestGetWeatherInfo(i);
+//        }
 
     }
 
-    private void checkWeatherAddressFragmentVisible() {
+    private void checkFragmentVisible(int position) {
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         if (fragmentList != null) {
             for (Fragment fragment : fragmentList) {
                 if (fragment != null) {
-                    if (fragment.isVisible() && fragment instanceof WeatherAddressFragment) {
-                        ((WeatherAddressFragment) fragment).getAddressAdapter().notifyDataSetChanged();
-                        return;
+                    if (fragment.isVisible()) {
+                        if (fragment instanceof WeatherAddressFragment) {
+                            ((WeatherAddressFragment) fragment).getAddressAdapter().notifyItemChanged(position);
+                            return;
+                        }else if(fragment instanceof WeatherHomeFragment){
+                            ((WeatherHomeFragment) fragment).getAdapter().notifyDataSetChanged();
+                            return;
+                        }
+
                     }
                 }
             }
@@ -149,19 +160,19 @@ public class MainActivity extends BaseActivity {
     }
 
     private boolean checkFragmentCanOpen() {
-        for (int i = 0 ; i < isReceiver.size() ; i++ ){
-            if(!isReceiver.get(i)){
-               return false;
+        for (int i = 0; i < isReceiver.size(); i++) {
+            if (!isReceiver.get(i)) {
+                return false;
             }
         }
         return true;
     }
 
     public void sendRequestGetWeatherInfo(int countAddress) {
-        if(isConnected(this)) {
+        if (isConnected(this)) {
             Intent intent = new Intent(MainActivity.this, WeatherWidget.class);
             intent.setAction(ACTION_SEND_REQUEST_FROM_FRAGMENT);
-            intent.putExtra(Common.COUNT_ADDRESS, countAddress);
+            intent.putExtra(Common.ADDRESS_ID, countAddress);
             sendBroadcast(intent);
         }
     }
@@ -193,7 +204,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS );
+                Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
                 startActivity(intent);
 
             }
@@ -227,30 +238,31 @@ public class MainActivity extends BaseActivity {
         return listWeatherResults;
     }
 
-    public void openWeatherHomeFragment(){
+    public void openWeatherHomeFragment(int positionPager) {
         WeatherHomeFragment fragment = new WeatherHomeFragment();
         fragment.setWeatherResultList(listWeatherResults);
+        fragment.setCurPositionPager(positionPager);
         android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_layout, fragment);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 
-    public void openWeatherAddressFragment(){
+    public void openWeatherAddressFragment() {
         WeatherAddressFragment fragment = new WeatherAddressFragment();
         fragment.setWeatherResultList(listWeatherResults);
         android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_layout, fragment);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 
-    public void openFindAddressFragment(){
+    public void openFindAddressFragment() {
         FindAddressFragment fragment = new FindAddressFragment();
         android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_layout, fragment);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 
     @Override
