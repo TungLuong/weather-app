@@ -31,6 +31,7 @@ public class WidgetConfigActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_widget_config);
 
+        //
         Intent configIntent = getIntent();
         Bundle extras = configIntent.getExtras();
         if (extras != null) {
@@ -45,12 +46,14 @@ public class WidgetConfigActivity extends AppCompatActivity {
             finish();
         }
 
+        // tao danh sach cac dia diem
         listView = findViewById(R.id.list_address);
         listAddress = new ArrayList<>();
         SharedPreferences sharedPreferences = getSharedPreferences(Common.DATA, MODE_PRIVATE);
-        int totalAddress = sharedPreferences.getInt("TOTAL_ADDRESS", 1);
+        int totalAddress = sharedPreferences.getInt(Common.SHARE_PREF_TOTAL_ADDRESS_KEY, 1);
         for (int i = 0; i < totalAddress; i++) {
-            listAddress.add(sharedPreferences.getString("ADDRESS_NAME" + i, "unknown"));
+            int addressId = sharedPreferences.getInt(Common.SHARE_PREF_ADDRESS_ID_KEY_AT+i,-1);
+            listAddress.add(sharedPreferences.getString(Common.SHARE_PREF_ADDRESS_NAME_KEY_AT +addressId , "unknown"));
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, android.R.id.text1, listAddress);
@@ -60,18 +63,21 @@ public class WidgetConfigActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Toast.makeText(WidgetConfigActivity.this, listAddress.get(position), Toast.LENGTH_SHORT).show();
 
+                // sua thong tin widget
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove("WIDGET_ADDRESS_ID"+appWidgetId);
-                editor.putInt("WIDGET_ADDRESS_ID"+appWidgetId,position);
+                int addressId = sharedPreferences.getInt(Common.SHARE_PREF_ADDRESS_ID_KEY_AT +position,-1);
+                editor.putInt(Common.SHARE_PREF_WIDGET_ADDRESS_ID_KEY_AT+appWidgetId,addressId);
                 editor.commit();
 
+                Toast.makeText(WidgetConfigActivity.this, "INTENT_ADDRESS_ID: "+addressId, Toast.LENGTH_SHORT).show();
+                //Gui thong tin cho widget provider cap nhat thong tin
                 Intent intent = new Intent(WidgetConfigActivity.this, WeatherWidget.class);
                 intent.setAction(ACTION_UPDATE_CONFIG_WEATHER);
-                intent.putExtra("APP_WIDGET_ID",appWidgetId);
+                intent.putExtra(Common.INTENT_APP_WIDGET_ID,appWidgetId);
                 sendBroadcast(intent);
 
+                // gui tin hieu ket thuc cau hinh
                 Intent resultValue = new Intent();
                 resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,appWidgetId);
                 setResult(RESULT_OK,resultValue);
@@ -82,10 +88,4 @@ public class WidgetConfigActivity extends AppCompatActivity {
         });
     }
 
-    private static void updateWeatherWidget(Context context) {
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.weather_widget);
-
-        appWidgetManager.updateAppWidget(appWidgetId, views);
-    }
 }

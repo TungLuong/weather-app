@@ -42,9 +42,10 @@ import tl.com.weatherapp.retrofit.IOpenWeatherMap;
 import tl.com.weatherapp.retrofit.RetrofitClient;
 
 import static tl.com.weatherapp.common.Common.ACTION_UPDATE_CONFIG_WEATHER;
-import static tl.com.weatherapp.common.Common.ACTION_SEND_REQUEST_FROM_FRAGMENT;
+import static tl.com.weatherapp.common.Common.ACTION_GET_WEATHER_RESULT_BY_ADDRESS_ID;
 import static tl.com.weatherapp.common.Common.ACTION_RECEIVER_RESPONSE_FROM_WIDGET;
 import static tl.com.weatherapp.common.Common.CURRENT_ADDRESS_ID;
+import static tl.com.weatherapp.common.Common.SHARE_PREF_ADDRESS_NAME_KEY_AT;
 
 /**
  * Implementation of App Widget functionality.
@@ -59,20 +60,24 @@ public class WeatherWidget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // There may be multiple widgets active, so update all of them
+
+
         this.context = context;
         sharedPreferences = context.getSharedPreferences(Common.DATA, Context.MODE_PRIVATE);
+        // cap nhat toan bo widget
         for (int appWidgetId : appWidgetIds) {
-            int addressID = sharedPreferences.getInt("WIDGET_ADDRESS_ID" + appWidgetId, -1);
+            int addressID = sharedPreferences.getInt( Common.SHARE_PREF_WIDGET_ADDRESS_ID_KEY_AT+ appWidgetId, -1);
+            // neu la location thi kiem tra toa do hien gio
+
             if (addressID == CURRENT_ADDRESS_ID) {
                 myLocation = new MyLocation();
-                myLocation.getDeviceLocation(addressID);
+                myLocation.updateWeatherDeviceLocation(addressID);
             } else if (addressID != -1) {
-                float lat = sharedPreferences.getFloat("LAT" + addressID, 0f);
-                float lng = sharedPreferences.getFloat("LNG" + addressID, 0f);
-                String address = sharedPreferences.getString("ADDRESS_NAME" + addressID, "unknown");
-                // lang phi tai nguyen
-                getWeatherInformation(lat, lng, addressID, address, appWidgetId);
+                // cap nhat weatherResult va widget
+                float lat = sharedPreferences.getFloat(Common.SHARE_PREF_LAT_KEY_AT + addressID, 0f);
+                float lng = sharedPreferences.getFloat(Common.SHARE_PREF_LNG_KEY_AT + addressID, 0f);
+                String address = sharedPreferences.getString(Common.SHARE_PREF_ADDRESS_NAME_KEY_AT  + addressID, "unknown");
+                updateWeatherInformation(lat, lng, addressID, address, appWidgetId);
             }
         }
     }
@@ -96,34 +101,36 @@ public class WeatherWidget extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
         this.context = context;
+        sharedPreferences = context.getSharedPreferences(Common.DATA, Context.MODE_PRIVATE);
         try {
-            if (intent.getAction().equals(ACTION_SEND_REQUEST_FROM_FRAGMENT)) {
-                int addressID = intent.getIntExtra(Common.ADDRESS_ID, -1);
-                int x = addressID;
-                if (addressID == CURRENT_ADDRESS_ID) {
+            if (intent.getAction().equals(ACTION_GET_WEATHER_RESULT_BY_ADDRESS_ID)) {
+                int position = intent.getIntExtra(Common.INTENT_ADDRESS_ID, -1);
+                int addressId = sharedPreferences.getInt(Common.SHARE_PREF_ADDRESS_ID_KEY_AT+position,-1);
+                if (position == CURRENT_ADDRESS_ID) {
                     myLocation = new MyLocation();
-                    myLocation.getDeviceLocation(UPDATE_ALL_WIDGET);
-                } else if (addressID != -1) {
-                    sharedPreferences = context.getSharedPreferences(Common.DATA, Context.MODE_PRIVATE);
-                    float lat = sharedPreferences.getFloat("LAT" + addressID, 0f);
-                    float lng = sharedPreferences.getFloat("LNG" + addressID, 0f);
-                    String address = sharedPreferences.getString("ADDRESS_NAME" + addressID, "unknown");
-                    getWeatherInformation(lat, lng, addressID, address, UPDATE_ALL_WIDGET);
+                    //cap nhat tat ca widget
+                    myLocation.updateWeatherDeviceLocation(UPDATE_ALL_WIDGET);
+                } else if (position != -1) {
+                    float lat = sharedPreferences.getFloat(Common.SHARE_PREF_LAT_KEY_AT + addressId, 0f);
+                    float lng = sharedPreferences.getFloat(Common.SHARE_PREF_LNG_KEY_AT + addressId, 0f);
+                    String address = sharedPreferences.getString(Common.SHARE_PREF_ADDRESS_NAME_KEY_AT  + addressId, "unknown");
+                    //cap nhat tat ca widget
+                    updateWeatherInformation(lat, lng, addressId, address, UPDATE_ALL_WIDGET);
                 }
             } else if (intent.getAction().equals(ACTION_UPDATE_CONFIG_WEATHER)) {
-                int appWidgetId = intent.getIntExtra("APP_WIDGET_ID", -1);
-                sharedPreferences = context.getSharedPreferences(Common.DATA, Context.MODE_PRIVATE);
+                int appWidgetId = intent.getIntExtra(Common.INTENT_APP_WIDGET_ID, -1);
                 if (appWidgetId != -1) {
-                    int addressID = sharedPreferences.getInt("WIDGET_ADDRESS_ID" + appWidgetId, -1);
+                    int addressID = sharedPreferences.getInt(Common.SHARE_PREF_WIDGET_ADDRESS_ID_KEY_AT + appWidgetId, -1);
                     if (addressID == CURRENT_ADDRESS_ID) {
                         myLocation = new MyLocation();
-                        myLocation.getDeviceLocation(appWidgetId);
+                        myLocation.updateWeatherDeviceLocation(appWidgetId);
                     } else if (addressID != -1) {
-                        float lat = sharedPreferences.getFloat("LAT" + addressID, 0f);
-                        float lng = sharedPreferences.getFloat("LNG" + addressID, 0f);
-                        String address = sharedPreferences.getString("ADDRESS_NAME" + addressID, "unknown");
-                        getWeatherInformation(lat, lng, addressID, address, appWidgetId);
+                        float lat = sharedPreferences.getFloat(Common.SHARE_PREF_LAT_KEY_AT + addressID, 0f);
+                        float lng = sharedPreferences.getFloat(Common.SHARE_PREF_LNG_KEY_AT + addressID, 0f);
+                        String address = sharedPreferences.getString(SHARE_PREF_ADDRESS_NAME_KEY_AT + addressID, "unknown");
+                        updateWeatherInformation(lat, lng, addressID, address, appWidgetId);
                     }
+
                 }
             }
 
@@ -133,7 +140,7 @@ public class WeatherWidget extends AppWidgetProvider {
 //        Toast.makeText(context,intent.getAction(),Toast.LENGTH_LONG);
     }
 
-    private static void getWeatherInformation(final float lat, final float lng, final int addressId, String address, int appWidgetId) {
+    private static void updateWeatherInformation(final float lat, final float lng, final int addressId, String address, int appWidgetId) {
 
         Retrofit retrofit = RetrofitClient.getInstance();
         IOpenWeatherMap mService = retrofit.create(IOpenWeatherMap.class);
@@ -152,8 +159,8 @@ public class WeatherWidget extends AppWidgetProvider {
                         weatherResult.setAddress(address);
                         Intent local = new Intent();
                         local.setAction(ACTION_RECEIVER_RESPONSE_FROM_WIDGET);
-                        local.putExtra(Common.ADDRESS_ID, addressId);
-                        local.putExtra(Common.WEATHER_RESULT, weatherResult);
+                        local.putExtra(Common.INTENT_ADDRESS_ID, addressId);
+                        local.putExtra(Common.INTENT_WEATHER_RESULT, weatherResult);
                         context.sendBroadcast(local);
                         updateWeatherWidget(weatherResult, addressId, appWidgetId);
 
@@ -163,8 +170,8 @@ public class WeatherWidget extends AppWidgetProvider {
                     public void accept(Throwable throwable) throws Exception {
                         Intent local = new Intent();
                         local.setAction(ACTION_RECEIVER_RESPONSE_FROM_WIDGET);
-                        local.putExtra(Common.ADDRESS_ID, addressId);
-                        local.putExtra(Common.WEATHER_RESULT, (Bundle) null);
+                        local.putExtra(Common.INTENT_ADDRESS_ID, addressId);
+                        local.putExtra(Common.INTENT_WEATHER_RESULT, (Bundle) null);
                         context.sendBroadcast(local);
                     }
                 }));
@@ -179,7 +186,7 @@ public class WeatherWidget extends AppWidgetProvider {
             ComponentName name = new ComponentName(context.getPackageName(), WeatherWidget.class.getName());
             int[] appWidgetIds = appWidgetManager.getAppWidgetIds(name);
             for (int id : appWidgetIds) {
-                int wgAddressId = sharedPreferences.getInt("WIDGET_ADDRESS_ID" + id, -1);
+                int wgAddressId = sharedPreferences.getInt(Common.SHARE_PREF_WIDGET_ADDRESS_ID_KEY_AT + id, -1);
                 if (weatherResult != null && wgAddressId != -1 && wgAddressId == addressID) {
                     String temp = Common.covertFtoC(weatherResult.getCurrently().getTemperature()) + "˚";
                     Picasso.get().load(new StringBuilder("https://darksky.net/images/weather-icons/")
@@ -192,7 +199,7 @@ public class WeatherWidget extends AppWidgetProvider {
                     views.setTextViewText(R.id.tv_location, lastLocation);
 
                     Intent intent = new Intent(context, MainActivity.class);
-                    intent.putExtra("ADDRESS_ID", addressID);
+                    intent.putExtra(Common.INTENT_ADDRESS_ID, addressID);
                     PendingIntent pendingIntent = PendingIntent.getActivity(context, id, intent, 0);
                     views.setOnClickPendingIntent(R.id.linear_layout, pendingIntent);
                     appWidgetManager.updateAppWidget(id, views);
@@ -211,7 +218,7 @@ public class WeatherWidget extends AppWidgetProvider {
                 views.setTextViewText(R.id.tv_location, lastLocation);
 
                 Intent intent = new Intent(context, MainActivity.class);
-                intent.putExtra("ADDRESS_ID", addressID);
+                intent.putExtra("INTENT_ADDRESS_ID", addressID);
                 PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, 0);
                 views.setOnClickPendingIntent(R.id.linear_layout, pendingIntent);
                 appWidgetManager.updateAppWidget(appWidgetId, views);
@@ -243,7 +250,7 @@ public class WeatherWidget extends AppWidgetProvider {
 //                public void onLocationResult(LocationResult locationResult) {
 //                    super.onLocationResult(locationResult);
 //                    Location location = locationResult.getLastLocation();
-//                    getWeatherInformation((float) location.getLatitude(),(float) location.getLongitude(),Common.CURRENT_ADDRESS_ID);
+//                    updateWeatherInformation((float) location.getLatitude(),(float) location.getLongitude(),Common.CURRENT_ADDRESS_ID);
 //                }
 //            };
 //
@@ -258,7 +265,7 @@ public class WeatherWidget extends AppWidgetProvider {
 //
 //        }
 
-        private void getDeviceLocation(int appWidgetId) {
+        private void updateWeatherDeviceLocation(int appWidgetId) {
             mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
             try {
                 if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -280,19 +287,17 @@ public class WeatherWidget extends AppWidgetProvider {
                                 cLng = (float) curLocation.getLongitude();
                                 cAddress = getAddress(cLat, cLng);
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.remove("LAT" + CURRENT_ADDRESS_ID);
-                                editor.remove("LNG" + CURRENT_ADDRESS_ID);
-                                editor.remove("ADDRESS_NAME" + CURRENT_ADDRESS_ID);
-                                editor.putFloat("LAT" + CURRENT_ADDRESS_ID, cLat);
-                                editor.putFloat("LNG" + CURRENT_ADDRESS_ID, cLng);
-                                editor.putString("ADDRESS_NAME" + CURRENT_ADDRESS_ID, cAddress);
+                                editor.putInt(Common.SHARE_PREF_ADDRESS_ID_KEY_AT+0,CURRENT_ADDRESS_ID);
+                                editor.putFloat(Common.SHARE_PREF_LAT_KEY_AT + CURRENT_ADDRESS_ID, cLat);
+                                editor.putFloat(Common.SHARE_PREF_LNG_KEY_AT + CURRENT_ADDRESS_ID, cLng);
+                                editor.putString(Common.SHARE_PREF_ADDRESS_NAME_KEY_AT + CURRENT_ADDRESS_ID, cAddress);
                                 editor.commit();
                             } else {
-                                cLat = sharedPreferences.getFloat("LAT" + CURRENT_ADDRESS_ID, 0f);
-                                cLng = sharedPreferences.getFloat("LNG" + CURRENT_ADDRESS_ID, 0f);
-                                cAddress = sharedPreferences.getString("ADDRESS_NAME" + CURRENT_ADDRESS_ID, "unknown");
+                                cLat = sharedPreferences.getFloat(Common.SHARE_PREF_LAT_KEY_AT + CURRENT_ADDRESS_ID, 0f);
+                                cLng = sharedPreferences.getFloat(Common.SHARE_PREF_LNG_KEY_AT + CURRENT_ADDRESS_ID, 0f);
+                                cAddress = sharedPreferences.getString(Common.SHARE_PREF_ADDRESS_NAME_KEY_AT + CURRENT_ADDRESS_ID, "unknown");
                             }
-                            getWeatherInformation(cLat, cLng, CURRENT_ADDRESS_ID, cAddress, appWidgetId);
+                            updateWeatherInformation(cLat, cLng, CURRENT_ADDRESS_ID, cAddress, appWidgetId);
                         } else {
                         }
                     }

@@ -1,34 +1,20 @@
 package tl.com.weatherapp;
 
-import android.Manifest;
-import android.app.Fragment;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.List;
-
 import tl.com.weatherapp.base.BaseFragment;
 import tl.com.weatherapp.common.Common;
-import tl.com.weatherapp.model.WeatherResult;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -62,13 +48,18 @@ public class FindAddressFragment extends BaseFragment implements PlaceSelectionL
     public void onPlaceSelected(Place place) {
         LatLng latLng = place.getLatLng();
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Common.DATA, MODE_PRIVATE);
-        int totalAddress = sharedPreferences.getInt("TOTAL_ADDRESS", 1);
+        int totalAddress = sharedPreferences.getInt(Common.SHARE_PREF_TOTAL_ADDRESS_KEY, 1);
+        int maxId = sharedPreferences.getInt(Common.SHARE_PREF_MAX_ID_KEY, 0);
+        int newId = maxId+1;
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putFloat("LAT" + totalAddress, (float) latLng.latitude);
-        editor.putFloat("LNG" + totalAddress, (float) latLng.longitude);
-        editor.putString("ADDRESS_NAME" + totalAddress, String.valueOf(place.getName()));
-        editor.remove("TOTAL_ADDRESS");
-        editor.putInt("TOTAL_ADDRESS", totalAddress + 1);
+        editor.putInt(Common.SHARE_PREF_ADDRESS_ID_KEY_AT+totalAddress,newId);
+
+        editor.putFloat(Common.SHARE_PREF_LAT_KEY_AT + newId, (float) latLng.latitude);
+        editor.putFloat(Common.SHARE_PREF_LNG_KEY_AT  + newId, (float) latLng.longitude);
+        editor.putString(Common.SHARE_PREF_ADDRESS_NAME_KEY_AT  + newId, String.valueOf(place.getName()));
+
+        editor.putInt(Common.SHARE_PREF_TOTAL_ADDRESS_KEY, totalAddress + 1);
+        editor.putInt(Common.SHARE_PREF_MAX_ID_KEY, newId);
         editor.commit();
         ((MainActivity) getActivity()).getIsReceiver().add(false);
         ((MainActivity) getActivity()).getListWeatherResults().add(null);

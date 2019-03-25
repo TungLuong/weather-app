@@ -10,15 +10,23 @@ import java.util.Date;
 public class Common {
     public static final String WEATHER_API_KEY = "015f333c2ca5576208dd63d15a91c5ba";
     public static final String GOOGLE_MAP_API_KEY = "AIzaSyAsvRrYBZ770RpBDQNsbaOCsz3XZjD9Vc8";
-    public static final String ADDRESS_ID = "ADDRESS_ID" ;
-    public static final String WEATHER_RESULT = "WEATHER_RESULT";
+    public static final String INTENT_ADDRESS_ID = "INTENT_ADDRESS_ID" ;
+    public static final String INTENT_WEATHER_RESULT = "INTENT_WEATHER_RESULT";
     public static final String DATA = "DATA";
     public static final int CURRENT_ADDRESS_ID = 0;
     public static final String LIST_WEATHER_RESULT = "LIST_WEATHER_RESULT";
     public static final String ACTION_UPDATE_CONFIG_WEATHER = "ACTION_UPDATE_CONFIG_WEATHER";
+    public static final String SHARE_PREF_LAT_KEY_AT = "SHARE_PREF_LAT_KEY_AT";
+    public static final String SHARE_PREF_LNG_KEY_AT = "SHARE_PREF_LNG_KEY_AT" ;
+    public static final String SHARE_PREF_ADDRESS_NAME_KEY_AT = "SHARE_PREF_ADDRESS_NAME_KEY_AT" ;
+    public static final String SHARE_PREF_WIDGET_ADDRESS_ID_KEY_AT = "SHARE_PREF_WIDGET_ADDRESS_ID_KEY_AT" ;
+    public static final String SHARE_PREF_ADDRESS_ID_KEY_AT = "SHARE_PREF_ADDRESS_ID_KEY_AT" ;
+    public static final String INTENT_APP_WIDGET_ID = "INTENT_APP_WIDGET_ID";
+    public static final String SHARE_PREF_TOTAL_ADDRESS_KEY = "SHARE_PREF_TOTAL_ADDRESS_KEY" ;
+    public static final String SHARE_PREF_MAX_ID_KEY = "SHARE_PREF_MAX_ID_KEY";
 
     //    public static Location current_location = new Location("");
-    public static String ACTION_SEND_REQUEST_FROM_FRAGMENT = "ACTION_SEND_REQUEST_FROM_FRAGMENT";
+    public static String ACTION_GET_WEATHER_RESULT_BY_ADDRESS_ID = "ACTION_GET_WEATHER_RESULT_BY_ADDRESS_ID";
     public static String ACTION_RECEIVER_RESPONSE_FROM_WIDGET = "ACTION_RECEIVER_RESPONSE_FROM_WIDGET";
 
     @RequiresApi(api = Build.VERSION_CODES.N)

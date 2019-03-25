@@ -66,4 +66,7 @@ dependencies {
     //swipe layout
     implementation "com.daimajia.swipelayout:library:1.2.0@aar"
 
+    //loading view
+    implementation 'com.victor:lib:1.0.4'
+
 }

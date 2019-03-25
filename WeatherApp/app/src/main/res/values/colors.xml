@@ -6,4 +6,7 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000</color>
     <color name="red">#DC143C</color>
+    <color name="book_loading_background">@color/black</color>
+    <color name="book_loading_book">@color/white</color>
+    <color name="book_loading_page">@color/black</color>
 </resources>

@@ -11,6 +11,40 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black">
+        <RelativeLayout
+            android:id="@+id/loading_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/app_name"
+                android:layout_width="300dp"
+                android:layout_height="100dp"
+                android:text="Weather app"
+                android:textColor="@color/white"
+                android:textSize="40dp"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal" />
+            <com.victor.loading.book.BookLoading
+                android:layout_gravity="center"
+                android:layout_below="@id/app_name"
+                android:id="@+id/bookloading"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="10dp"
+                android:paddingLeft="80dp"
+                android:paddingRight="80dp"
+                android:layout_width="300dp"
+                android:layout_height="100dp" />
+            <com.victor.loading.newton.NewtonCradleLoading
+                android:layout_gravity="center_horizontal"
+                android:layout_below="@id/bookloading"
+                android:id="@+id/newton_cradle_loading"
+                android:paddingLeft="50dp"
+                android:paddingRight="50dp"
+                android:gravity="center"
+                android:layout_width="300dp"
+                android:layout_height="100dp" />
+        </RelativeLayout>
     </FrameLayout>
 
 </RelativeLayout>

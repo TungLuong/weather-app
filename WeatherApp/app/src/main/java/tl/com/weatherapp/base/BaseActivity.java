@@ -30,13 +30,13 @@ public class BaseActivity extends AppCompatActivity {
         builder.setTitle("Thoát");
         builder.setMessage("Bạn có chắc chắn muốn thoát không");
         builder.setCancelable(false);
-        builder.setPositiveButton("Quay lại", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Quay lại", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
             }
         });
-        builder.setNegativeButton("Đồng ý", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 onBackRoot();
