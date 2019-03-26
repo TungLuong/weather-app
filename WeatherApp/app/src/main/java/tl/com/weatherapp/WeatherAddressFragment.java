@@ -1,10 +1,7 @@
 package tl.com.weatherapp;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -21,12 +18,11 @@ import java.util.List;
 import tl.com.weatherapp.adapter.ItemWeatherAddressAdapter;
 import tl.com.weatherapp.base.BaseFragment;
 import tl.com.weatherapp.common.Common;
-import tl.com.weatherapp.model.ListWeatherResult;
 import tl.com.weatherapp.model.WeatherResult;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class WeatherAddressFragment extends BaseFragment implements IListenerDelete {
+public class WeatherAddressFragment extends BaseFragment implements IListenerWeatherAddressAdapter {
 
     private RecyclerView rcvWeatherAddress;
     private ImageView btnAddAddress;
@@ -155,6 +151,11 @@ public class WeatherAddressFragment extends BaseFragment implements IListenerDel
 //        }
 //        editor.commit();
         addressAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void openWeatherHomeFragment(int position) {
+        ((MainActivity) getActivity()).openWeatherHomeFragment(position);
     }
 
     public void setWeatherResultList(List<WeatherResult> weatherResultList) {

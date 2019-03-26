@@ -68,10 +68,9 @@ public class WeatherWidget extends AppWidgetProvider {
         for (int appWidgetId : appWidgetIds) {
             int addressID = sharedPreferences.getInt( Common.SHARE_PREF_WIDGET_ADDRESS_ID_KEY_AT+ appWidgetId, -1);
             // neu la location thi kiem tra toa do hien gio
-
             if (addressID == CURRENT_ADDRESS_ID) {
                 myLocation = new MyLocation();
-                myLocation.updateWeatherDeviceLocation(addressID);
+                myLocation.updateWeatherDeviceLocation(appWidgetId);
             } else if (addressID != -1) {
                 // cap nhat weatherResult va widget
                 float lat = sharedPreferences.getFloat(Common.SHARE_PREF_LAT_KEY_AT + addressID, 0f);
@@ -218,7 +217,7 @@ public class WeatherWidget extends AppWidgetProvider {
                 views.setTextViewText(R.id.tv_location, lastLocation);
 
                 Intent intent = new Intent(context, MainActivity.class);
-                intent.putExtra("INTENT_ADDRESS_ID", addressID);
+                intent.putExtra(Common.INTENT_ADDRESS_ID, addressID);
                 PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, 0);
                 views.setOnClickPendingIntent(R.id.linear_layout, pendingIntent);
                 appWidgetManager.updateAppWidget(appWidgetId, views);

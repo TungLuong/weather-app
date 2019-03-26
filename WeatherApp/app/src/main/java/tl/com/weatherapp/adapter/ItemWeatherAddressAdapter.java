@@ -18,7 +18,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import tl.com.weatherapp.IListenerDelete;
+import tl.com.weatherapp.IListenerWeatherAddressAdapter;
 import tl.com.weatherapp.R;
 import tl.com.weatherapp.common.Common;
 import tl.com.weatherapp.model.WeatherResult;
@@ -27,12 +27,12 @@ public class ItemWeatherAddressAdapter extends RecyclerSwipeAdapter<ItemWeatherA
 
     private List<WeatherResult> weatherResultList;
     private Context mContext;
-    private IListenerDelete iListenerDelete;
+    private IListenerWeatherAddressAdapter iListenerWeatherAddressAdapter;
 
-    public ItemWeatherAddressAdapter(List<WeatherResult> weatherResultList, Context mContext, IListenerDelete iListenerDelete) {
+    public ItemWeatherAddressAdapter(List<WeatherResult> weatherResultList, Context mContext, IListenerWeatherAddressAdapter iListenerWeatherAddressAdapter) {
         this.weatherResultList = weatherResultList;
         this.mContext = mContext;
-        this.iListenerDelete = iListenerDelete;
+        this.iListenerWeatherAddressAdapter = iListenerWeatherAddressAdapter;
     }
 
     @NonNull
@@ -72,9 +72,16 @@ public class ItemWeatherAddressAdapter extends RecyclerSwipeAdapter<ItemWeatherA
                     Toast.makeText(mContext,"Cannot remove location",Toast.LENGTH_SHORT).show();
                     notifyDataSetChanged();
                 }else {
-                    iListenerDelete.deleteItem(position);
+                    iListenerWeatherAddressAdapter.deleteItem(position);
                 }
                 mItemManger.closeAllItems();
+            }
+        });
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iListenerWeatherAddressAdapter.openWeatherHomeFragment(holder.getAdapterPosition());
             }
         });
         String icon_name = weatherResultList.get(position).getCurrently().getIcon().replace('-', '_')+"_compact";
