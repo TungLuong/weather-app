@@ -135,7 +135,6 @@ public class WeatherFragment extends Fragment {
                 float al = 20.0f / (scrollY + 1) - 0.25f;
                 tv2.setAlpha(al);
                 linearLayout.setY(Math.max(tv1.getHeight() + tv3.getHeight() + scrollY, tv1.getHeight() + tv2.getHeight() + tv3.getHeight() - scrollY));
-                int x = scrollView1.getScrollY();
 
 
             }
@@ -165,10 +164,16 @@ public class WeatherFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             getWeatherInfo(weatherResult);
         }
+        scrollView();
         refreshLayout.setRefreshing(false);
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //scrollView();
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getWeatherInfo(WeatherResult weatherResult) {
@@ -225,6 +230,10 @@ public class WeatherFragment extends Fragment {
         //scrollView1.setVisibility(View.VISIBLE);
         //loading.setVisibility(View.GONE);
 
+    }
+
+    public void scrollView(){
+        scrollView1.smoothScrollBy(0,0);
     }
 
     public void isDisConnected(){

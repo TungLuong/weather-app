@@ -28,7 +28,9 @@ public class WeatherFragmentAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return new WeatherFragment(weatherResultList.get(position),position);
+        WeatherFragment fragment = new WeatherFragment(weatherResultList.get(position),position);
+       // fragment.scrollView();
+        return fragment;
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -45,6 +46,7 @@ import static tl.com.weatherapp.common.Common.SHARE_PREF_ADDRESS_ID_KEY_AT;
 public class MainActivity extends BaseActivity {
 
     private AlertDialog dialogInternet;
+    private AlertDialog dialogLocation;
 
     private BroadcastReceiver UIBroadcastReceiver;
 
@@ -55,6 +57,7 @@ public class MainActivity extends BaseActivity {
     private List<Boolean> isReceiver = new ArrayList<>();
     private RelativeLayout loadingView;
 
+    private boolean fragmentHomeIsVisible = false;
     private static SharedPreferences sharedPreferences;
 
     @Override
@@ -104,13 +107,14 @@ public class MainActivity extends BaseActivity {
 
     private void init() {
         if (!isConnected(MainActivity.this)) {
-            dialogInternet = buildDialog(MainActivity.this).show();
+            dialogInternet = buildDialogInternet(MainActivity.this).show();
         }
 
         // register broadcast
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_RECEIVER_RESPONSE_FROM_WIDGET);
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        filter.addAction("android.location.PROVIDERS_CHANGED");
 
         UIBroadcastReceiver = new BroadcastReceiver() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -127,8 +131,9 @@ public class MainActivity extends BaseActivity {
                     if (!isReceiver.get(position) && isReceiver.size()>0) {
                         isReceiver.set(position, true);
                         listWeatherResults.set(position, weatherResult);
-                        if (position == positionPager) {
+                        if (position == positionPager && !fragmentHomeIsVisible) {
                             openWeatherHomeFragment(positionPager);
+                            fragmentHomeIsVisible = true;
                             loadingView.setVisibility(View.GONE);
                         }
                         checkFragmentVisible(position);
@@ -138,6 +143,9 @@ public class MainActivity extends BaseActivity {
 
                 } else if (intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
                     if (isConnected(MainActivity.this)) {
+                        if(!isEnabledLocation(MainActivity.this)){
+                            dialogLocation = buildDialogLocation(MainActivity.this).show();
+                        }
                         if (dialogInternet != null) {
                             dialogInternet.cancel();
                         }
@@ -148,6 +156,12 @@ public class MainActivity extends BaseActivity {
                             isReceiver.add(false);
                             sendRequestGetWeatherInfo(i);
                         }
+                    }
+
+                }else if (intent.getAction().equals("android.location.PROVIDERS_CHANGED")){
+                    if (isEnabledLocation(MainActivity.this)){
+                        isReceiver.set(0,false);
+                        sendRequestGetWeatherInfo(CURRENT_ADDRESS_ID);
                     }
 
                 }
@@ -211,8 +225,7 @@ public class MainActivity extends BaseActivity {
             return false;
     }
 
-    public AlertDialog.Builder buildDialog(Context c) {
-
+    public AlertDialog.Builder buildDialogInternet(Context c) {
         AlertDialog.Builder builder = new AlertDialog.Builder(c);
         builder.setTitle("No Internet Connection");
         builder.setMessage("You need to have Mobile Data or wifi to access this.");
@@ -237,6 +250,47 @@ public class MainActivity extends BaseActivity {
         });
 
         return builder;
+    }
+
+    public AlertDialog.Builder buildDialogLocation(Context c) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(c);
+        builder.setMessage(R.string.gps_network_not_enabled);
+
+        builder.setNegativeButton("Settings", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+
+            }
+        });
+
+        builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+
+            }
+        });
+        return builder;
+    }
+
+    public boolean isEnabledLocation(Context context){
+        LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {}
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {}
+
+       return gps_enabled||network_enabled;
     }
 
     public List<Boolean> getIsReceiver() {
