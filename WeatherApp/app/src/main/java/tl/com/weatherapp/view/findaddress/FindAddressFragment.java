@@ -1,4 +1,4 @@
-package tl.com.weatherapp;
+package tl.com.weatherapp.view.findaddress;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,14 +13,18 @@ import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLng;
 
+import tl.com.weatherapp.R;
 import tl.com.weatherapp.base.BaseFragment;
 import tl.com.weatherapp.common.Common;
+import tl.com.weatherapp.presenter.findaddress.FindAddressPresenter;
+import tl.com.weatherapp.view.main.MainActivity;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class FindAddressFragment extends BaseFragment implements PlaceSelectionListener {
 
-    PlaceAutocompleteFragment autocompleteFragment;
+    private PlaceAutocompleteFragment autocompleteFragment;
+    private FindAddressPresenter presenter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +37,7 @@ public class FindAddressFragment extends BaseFragment implements PlaceSelectionL
 
         View view = inflater.inflate(R.layout.fragment_find_address, container, false);
         initView(view);
-
+        presenter = new FindAddressPresenter();
         return view;
     }
 
@@ -46,25 +50,7 @@ public class FindAddressFragment extends BaseFragment implements PlaceSelectionL
 
     @Override
     public void onPlaceSelected(Place place) {
-        LatLng latLng = place.getLatLng();
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Common.DATA, MODE_PRIVATE);
-        int totalAddress = sharedPreferences.getInt(Common.SHARE_PREF_TOTAL_ADDRESS_KEY, 1);
-        int maxId = sharedPreferences.getInt(Common.SHARE_PREF_MAX_ID_KEY, 0);
-        int newId = maxId+1;
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(Common.SHARE_PREF_ADDRESS_ID_KEY_AT+totalAddress,newId);
-
-        editor.putFloat(Common.SHARE_PREF_LAT_KEY_AT + newId, (float) latLng.latitude);
-        editor.putFloat(Common.SHARE_PREF_LNG_KEY_AT  + newId, (float) latLng.longitude);
-        editor.putString(Common.SHARE_PREF_ADDRESS_NAME_KEY_AT  + newId, String.valueOf(place.getName()));
-
-        editor.putInt(Common.SHARE_PREF_TOTAL_ADDRESS_KEY, totalAddress + 1);
-        editor.putInt(Common.SHARE_PREF_MAX_ID_KEY, newId);
-        editor.commit();
-        ((MainActivity) getActivity()).getIsReceiver().add(false);
-        ((MainActivity) getActivity()).getListWeatherResults().add(null);
-        ((MainActivity) getActivity()).setTotalAddress(totalAddress + 1);
-        ((MainActivity) getActivity()).sendRequestGetWeatherInfo(totalAddress);
+        presenter.addAddress(place);
         onBackPressed();
 
     }

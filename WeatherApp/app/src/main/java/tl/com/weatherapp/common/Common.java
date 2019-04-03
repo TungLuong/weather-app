@@ -24,6 +24,9 @@ public class Common {
     public static final String INTENT_APP_WIDGET_ID = "INTENT_APP_WIDGET_ID";
     public static final String SHARE_PREF_TOTAL_ADDRESS_KEY = "SHARE_PREF_TOTAL_ADDRESS_KEY" ;
     public static final String SHARE_PREF_MAX_ID_KEY = "SHARE_PREF_MAX_ID_KEY";
+    public static final int UPDATE_ALL_WIDGET = -1;
+    public static final int NO_UPDATE_WIDGET = -2 ;
+    public static final String SHARE_PREF_WEATHER_KEY_AT = "SHARE_PREF_WEATHER_KEY_AT" ;
 
     //    public static Location current_location = new Location("");
     public static String ACTION_GET_WEATHER_RESULT_BY_ADDRESS_ID = "ACTION_GET_WEATHER_RESULT_BY_ADDRESS_ID";

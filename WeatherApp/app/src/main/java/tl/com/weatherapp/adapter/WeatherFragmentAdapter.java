@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import tl.com.weatherapp.WeatherFragment;
+import tl.com.weatherapp.view.weatherdetail.WeatherDetailFragment;
 import tl.com.weatherapp.model.WeatherResult;
 
 public class WeatherFragmentAdapter extends FragmentStatePagerAdapter {
@@ -28,7 +28,7 @@ public class WeatherFragmentAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        WeatherFragment fragment = new WeatherFragment(weatherResultList.get(position),position);
+        WeatherDetailFragment fragment = new WeatherDetailFragment(weatherResultList.get(position),position);
        // fragment.scrollView();
         return fragment;
     }
@@ -98,7 +98,7 @@ public class WeatherFragmentAdapter extends FragmentStatePagerAdapter {
 //        //tao ra item view
 //        LayoutInflater inflate = LayoutInflater.from(container.getContext());
 //        View itemView =
-//                inflate.inflate(R.layout.fragment_weather,
+//                inflate.inflate(R.layout.fragment_weather_detail,
 //                        container, false);
 //        //anh xa cac view trong itemview
 //        initView(itemView);

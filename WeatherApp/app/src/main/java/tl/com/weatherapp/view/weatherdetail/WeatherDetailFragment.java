@@ -1,6 +1,7 @@
-package tl.com.weatherapp;
+package tl.com.weatherapp.view.weatherdetail;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -24,26 +25,29 @@ import android.widget.TextView;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
+import tl.com.weatherapp.R;
 import tl.com.weatherapp.adapter.ItemDailyWeatherAdapter;
 import tl.com.weatherapp.adapter.ItemHourlyWeatherAdapter;
 import tl.com.weatherapp.common.Common;
 import tl.com.weatherapp.model.WeatherResult;
+import tl.com.weatherapp.presenter.weatherdetail.WeatherDetailPresenter;
 
 import static tl.com.weatherapp.common.Common.convertUnixToDate;
 
 
-public class WeatherFragment extends Fragment {
+@TargetApi(Build.VERSION_CODES.M)
+public class WeatherDetailFragment extends Fragment implements View.OnScrollChangeListener {
 
-    static WeatherFragment instance;
+    static WeatherDetailFragment instance;
 
     private SwipeRefreshLayout refreshLayout;
     private RoundedImageView imgWeather;
     private ImageView iconWeather;
     private TextView tvCityName, tvHumidity, tvPressure, tvTemperature, tvDateTime, tvWindSpeed, tvDescription, tvDewPoint, tvCloudCover, tvUVIndex, tvVisibility, tvOzone;
-    private LinearLayout tv1, tv2, tv3;
+    private LinearLayout mLinerLayout1, mLinerLayout2, mLinerLayour3;
     private RecyclerView rcvDaily, rcvHourly;
-    private ScrollView scrollView1;
-    private NestedScrollView scrollView2;
+    private NestedScrollView scrollView1;
+    private ScrollView scrollView2;
     private LinearLayout linearLayout;
     private LinearLayout weatherPanel;
     //private ProgressBar loading;
@@ -55,28 +59,30 @@ public class WeatherFragment extends Fragment {
 
     private WeatherResult weatherResult;
     private int countAddress;
+    private float alphaLinerLayout2 = 1.0f;
+    private WeatherDetailPresenter presenter;
 
-    public WeatherFragment() {
+    public WeatherDetailFragment() {
     }
 
     @SuppressLint("ValidFragment")
-    public WeatherFragment(WeatherResult weatherResult,int countAddress) {
+    public WeatherDetailFragment(WeatherResult weatherResult, int countAddress) {
         this.weatherResult = weatherResult;
         this.countAddress = countAddress;
+        presenter = new WeatherDetailPresenter();
+
     }
 
-    //    public WeatherFragment() {
+    //    public WeatherDetailFragment() {
 //
 //    }
 //
-//    public static WeatherFragment getInstance() {
+//    public static WeatherDetailFragment getInstance() {
 //        if (instance == null) {
-//            instance = new WeatherFragment();
+//            instance = new WeatherDetailFragment();
 //        }
 //        return instance;
 //    }
-
-
 
 
     @Override
@@ -90,7 +96,7 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_weather, container, false);
+        View view = inflater.inflate(R.layout.fragment_weather_detail, container, false);
 
 
         // loading = view.findViewById(R.id.loading);
@@ -111,9 +117,9 @@ public class WeatherFragment extends Fragment {
         rcvDaily = view.findViewById(R.id.rcv_daily);
         rcvHourly = view.findViewById(R.id.rcv_hourly);
 
-        tv1 = view.findViewById(R.id.liner_layout_1);
-        tv2 = view.findViewById(R.id.liner_layout_2);
-        tv3 = view.findViewById(R.id.liner_layout_3);
+        mLinerLayout1 = view.findViewById(R.id.liner_layout_1);
+        mLinerLayout2 = view.findViewById(R.id.liner_layout_2);
+        mLinerLayour3 = view.findViewById(R.id.liner_layout_3);
 //        listView = findViewById(R.id.list_item);
 //        List<String> modelList = new ArrayList<>();
 //        for (int i = 0; i < 5; i++) {
@@ -126,58 +132,41 @@ public class WeatherFragment extends Fragment {
         //scrollView1.setVisibility(View.INVISIBLE);
         scrollView2 = view.findViewById(R.id.scrollView_2);
         linearLayout = view.findViewById(R.id.linear);
-        scrollView1.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+        scrollView1.setOnScrollChangeListener(this);
 
-                tv1.setY(Math.max(0, scrollY));
-                tv3.setY(Math.max(tv1.getHeight() + scrollY, tv1.getHeight() + tv2.getHeight() - scrollY));
-                float al = 20.0f / (scrollY + 1) - 0.25f;
-                tv2.setAlpha(al);
-                linearLayout.setY(Math.max(tv1.getHeight() + tv3.getHeight() + scrollY, tv1.getHeight() + tv2.getHeight() + tv3.getHeight() - scrollY));
-
-
-            }
-        });
-        scrollView2.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-
-                if (tv3.getY() > tv1.getHeight() + tv1.getY()) {
-                    scrollView2.scrollTo(0, 0);
-                } else scrollView2.scrollTo(0, scrollY);
-
-
-            }
-        });
+        scrollView2.setOnScrollChangeListener(this);
 
         refreshLayout = view.findViewById(R.id.refresh_layout);
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refreshLayout.setRefreshing(true);
-                ((MainActivity)getActivity()).getIsReceiver().set(countAddress,false);
-                ((MainActivity)getActivity()).sendRequestGetWeatherInfo(countAddress);
+                presenter.updateInformationByPosition(countAddress);
+//                ((MainActivity) getActivity()).getIsReceiver().set(countAddress, false);
+//                ((MainActivity) getActivity()).sendRequestGetWeatherInfo(countAddress);
 
             }
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             getWeatherInfo(weatherResult);
         }
-        scrollView();
         refreshLayout.setRefreshing(false);
+        scrollView();
         return view;
+    }
+
+    private void scrollView() {
+        scrollView1.smoothScrollBy(0,0);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        //scrollView();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getWeatherInfo(WeatherResult weatherResult) {
-        if (weatherResult == null){
+        if (weatherResult == null) {
             refreshLayout.setRefreshing(true);
             Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getContext().getPackageName() + "/drawable/" + "blue_sky_2");
             Picasso.get()
@@ -211,11 +200,11 @@ public class WeatherFragment extends Fragment {
         // load information
         if (weatherResult.getAddress() == null) {
             tvCityName.setText("unknown where");
-        }else tvCityName.setText(weatherResult.getAddress());
+        } else tvCityName.setText(weatherResult.getAddress());
 
 
         tvDateTime.setText(convertUnixToDate(weatherResult.getCurrently().getTime()) + "");
-        tvHumidity.setText(weatherResult.getCurrently().getHumidity()*100 + "%");
+        tvHumidity.setText(weatherResult.getCurrently().getHumidity() * 100 + "%");
         tvPressure.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getPressure())).append(" hPa"));
         tvTemperature.setText(new StringBuilder(String.valueOf(Common.covertFtoC(weatherResult.getCurrently().getTemperature()))).append("˚"));
         tvWindSpeed.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getWindSpeed())).append("m/s"));
@@ -232,11 +221,7 @@ public class WeatherFragment extends Fragment {
 
     }
 
-    public void scrollView(){
-        scrollView1.smoothScrollBy(0,0);
-    }
-
-    public void isDisConnected(){
+    public void isDisConnected() {
         refreshLayout.setRefreshing(true);
     }
 
@@ -244,5 +229,28 @@ public class WeatherFragment extends Fragment {
     public void onPause() {
         super.onPause();
     }
+
+    @Override
+    public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+        switch (v.getId()) {
+            case R.id.scrollView_1:
+                mLinerLayout1.setY(Math.max(0, scrollY));
+                mLinerLayour3.setY(Math.max(mLinerLayout1.getHeight() + scrollY, mLinerLayout1.getHeight() + mLinerLayout2.getHeight() - scrollY));
+
+                alphaLinerLayout2 = 20.0f / (scrollY + 1) - 0.25f;
+                mLinerLayout2.setAlpha(alphaLinerLayout2);
+                linearLayout.setY(Math.max(mLinerLayout1.getHeight() + mLinerLayour3.getHeight() + scrollY
+                        , mLinerLayout1.getHeight() + mLinerLayout2.getHeight() + mLinerLayour3.getHeight() - scrollY));
+                break;
+            case R.id.scrollView_2:
+                if (mLinerLayour3.getY() > mLinerLayout1.getHeight() + mLinerLayout1.getY()) {
+                    scrollView2.scrollTo(0, 0);
+                } else scrollView2.scrollTo(0, scrollY);
+                break;
+
+        }
+
+    }
+
 }
 

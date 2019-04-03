@@ -8,7 +8,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "tl.com.weatherapp"
-        minSdkVersion 17
+        minSdkVersion 15
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"

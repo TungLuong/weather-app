@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
     <!--<android.support.v4.widget.ContentLoadingProgressBar-->
         <!--android:id="@+id/loading"-->
@@ -34,10 +36,12 @@
         android:layout_height="match_parent"
         android:id="@+id/refresh_layout"
         >
-        <ScrollView
+        <android.support.v4.widget.NestedScrollView
             android:id="@+id/scrollView_1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -139,26 +143,27 @@
                 <LinearLayout
                     android:id="@+id/linear"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
 
-                    <android.support.v4.widget.NestedScrollView
+                    <ScrollView
+                        android:nestedScrollingEnabled="true"
                         android:id="@+id/scrollView_2"
                         android:layout_width="match_parent"
                         android:layout_height="350dp">
-
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:orientation="vertical">
 
                             <android.support.v7.widget.RecyclerView
                                 android:id="@+id/rcv_daily"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+                                android:layout_height="400dp"></android.support.v7.widget.RecyclerView>
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="wrap_content"
                                 android:orientation="vertical">
                                 <View
                                     android:layout_width="match_parent"
@@ -408,10 +413,10 @@
 
                             </LinearLayout>
                         </LinearLayout>
-                    </android.support.v4.widget.NestedScrollView>
+                    </ScrollView>
                 </LinearLayout>
             </LinearLayout>
-        </ScrollView>
+        </android.support.v4.widget.NestedScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
