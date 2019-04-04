@@ -25,10 +25,15 @@ import android.widget.TextView;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import tl.com.weatherapp.R;
+import tl.com.weatherapp.adapter.ItemAttributeWeatherAdapter;
 import tl.com.weatherapp.adapter.ItemDailyWeatherAdapter;
 import tl.com.weatherapp.adapter.ItemHourlyWeatherAdapter;
 import tl.com.weatherapp.common.Common;
+import tl.com.weatherapp.model.AttributeWeather;
 import tl.com.weatherapp.model.WeatherResult;
 import tl.com.weatherapp.presenter.weatherdetail.WeatherDetailPresenter;
 
@@ -45,7 +50,7 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
     private ImageView iconWeather;
     private TextView tvCityName, tvHumidity, tvPressure, tvTemperature, tvDateTime, tvWindSpeed, tvDescription, tvDewPoint, tvCloudCover, tvUVIndex, tvVisibility, tvOzone;
     private LinearLayout mLinerLayout1, mLinerLayout2, mLinerLayour3;
-    private RecyclerView rcvDaily, rcvHourly;
+    private RecyclerView rcvDaily, rcvHourly,rcvAttributeWeather;
     private NestedScrollView scrollView1;
     private ScrollView scrollView2;
     private LinearLayout linearLayout;
@@ -102,20 +107,21 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         // loading = view.findViewById(R.id.loading);
         background = view.findViewById(R.id.background_image_view);
         tvCityName = view.findViewById(R.id.tv_city_name);
-        tvHumidity = view.findViewById(R.id.tv_humidity);
-        tvPressure = view.findViewById(R.id.tv_pressure);
+//        tvHumidity = view.findViewById(R.id.tv_humidity);
+//        tvPressure = view.findViewById(R.id.tv_pressure);
         tvTemperature = view.findViewById(R.id.tv_temperature);
         tvDateTime = view.findViewById(R.id.tv_date_time);
-        tvWindSpeed = view.findViewById(R.id.tv_windSpeed);
+       // tvWindSpeed = view.findViewById(R.id.tv_windSpeed);
         tvDescription = view.findViewById(R.id.tv_description);
-        tvDewPoint = view.findViewById(R.id.tv_dewPoint);
-        tvCloudCover = view.findViewById(R.id.tv_cloudCover);
-        tvUVIndex = view.findViewById(R.id.tv_uvIndex);
-        tvVisibility = view.findViewById(R.id.tv_visibility);
-        tvOzone = view.findViewById(R.id.tv_ozone);
+//        tvDewPoint = view.findViewById(R.id.tv_dewPoint);
+//        tvCloudCover = view.findViewById(R.id.tv_cloudCover);
+//        tvUVIndex = view.findViewById(R.id.tv_uvIndex);
+//        tvVisibility = view.findViewById(R.id.tv_visibility);
+//        tvOzone = view.findViewById(R.id.tv_ozone);
 
         rcvDaily = view.findViewById(R.id.rcv_daily);
         rcvHourly = view.findViewById(R.id.rcv_hourly);
+        rcvAttributeWeather = view.findViewById(R.id.rcv_attribute_weather);
 
         mLinerLayout1 = view.findViewById(R.id.liner_layout_1);
         mLinerLayout2 = view.findViewById(R.id.liner_layout_2);
@@ -191,11 +197,12 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         rcvHourly.setAdapter(itemHourlyWeatherAdapter);
 
         //set RecyclerView Daily
-        LinearLayoutManager layoutManager_2 = new LinearLayoutManager(getContext());
-        layoutManager_2.setOrientation(LinearLayoutManager.VERTICAL);
+        LinearLayoutManager layoutManager2 = new LinearLayoutManager(getContext());
+        layoutManager2.setOrientation(LinearLayoutManager.VERTICAL);
         ItemDailyWeatherAdapter itemDailyWeatherAdapter = new ItemDailyWeatherAdapter(weatherResult);
-        rcvDaily.setLayoutManager(layoutManager_2);
+        rcvDaily.setLayoutManager(layoutManager2);
         rcvDaily.setAdapter(itemDailyWeatherAdapter);
+        rcvDaily.setNestedScrollingEnabled(false);
 
         // load information
         if (weatherResult.getAddress() == null) {
@@ -203,21 +210,42 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         } else tvCityName.setText(weatherResult.getAddress());
 
 
+        List<AttributeWeather> list= new ArrayList<>();
+        list.add(new AttributeWeather(getString(R.string.Humidity),new StringBuffer(String.valueOf(weatherResult.getCurrently().getHumidity() * 100)).append("%").toString()));
+        list.add(new AttributeWeather(getString(R.string.Pressure),new StringBuilder(String.valueOf(weatherResult.getCurrently().getPressure())).append(" hPa").toString()));
+        list.add(new AttributeWeather(getString(R.string.WindSpeed),new StringBuilder(String.valueOf(weatherResult.getCurrently().getWindSpeed())).append("m/s").toString()));
+        list.add(new AttributeWeather(getString(R.string.DewPoint),new StringBuilder(String.valueOf(Common.covertFtoC(weatherResult.getCurrently().getDewPoint()))).append("˚").toString()));
+        list.add(new AttributeWeather(getString(R.string.CloudCover),new StringBuilder(String.valueOf(weatherResult.getCurrently().getCloudCover())).toString()));
+        list.add(new AttributeWeather(getString(R.string.UVIndex),new StringBuilder(String.valueOf(weatherResult.getCurrently().getUvIndex())).toString()));
+        list.add(new AttributeWeather(getString(R.string.Visibility),new StringBuilder(String.valueOf(weatherResult.getCurrently().getVisibility())).append("+ km").toString()));
+        list.add(new AttributeWeather(getString(R.string.Ozone),new StringBuilder(String.valueOf(weatherResult.getCurrently().getOzone())).toString()));
+        //set RecyclerView Attribute Weather
+
+        ItemAttributeWeatherAdapter itemAttributeWeatherAdapter = new ItemAttributeWeatherAdapter(list);
+        LinearLayoutManager layoutManager3 = new LinearLayoutManager(getContext());
+        layoutManager3.setOrientation(LinearLayoutManager.VERTICAL);
+        rcvAttributeWeather.setNestedScrollingEnabled(false);
+        rcvAttributeWeather.setLayoutManager(layoutManager3);
+        rcvAttributeWeather.setAdapter(itemAttributeWeatherAdapter);
+
+
         tvDateTime.setText(convertUnixToDate(weatherResult.getCurrently().getTime()) + "");
-        tvHumidity.setText(weatherResult.getCurrently().getHumidity() * 100 + "%");
-        tvPressure.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getPressure())).append(" hPa"));
+       // tvHumidity.setText(weatherResult.getCurrently().getHumidity() * 100 + "%");
+       // tvPressure.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getPressure())).append(" hPa"));
         tvTemperature.setText(new StringBuilder(String.valueOf(Common.covertFtoC(weatherResult.getCurrently().getTemperature()))).append("˚"));
-        tvWindSpeed.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getWindSpeed())).append("m/s"));
+       //tvWindSpeed.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getWindSpeed())).append("m/s"));
         tvDescription.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getSummary())));
-        tvDewPoint.setText(new StringBuilder(String.valueOf(Common.covertFtoC(weatherResult.getCurrently().getDewPoint()))).append("˚"));
-        tvCloudCover.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getCloudCover())));
-        tvUVIndex.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getUvIndex())));
-        tvVisibility.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getVisibility())).append("+ km"));
-        tvOzone.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getOzone())).append(""));
+       // tvDewPoint.setText(new StringBuilder(String.valueOf(Common.covertFtoC(weatherResult.getCurrently().getDewPoint()))).append("˚"));
+       // tvCloudCover.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getCloudCover())));
+       // tvUVIndex.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getUvIndex())));
+        //tvVisibility.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getVisibility())).append("+ km"));
+       // tvOzone.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getOzone())).append(""));
 
         // display
         //scrollView1.setVisibility(View.VISIBLE);
         //loading.setVisibility(View.GONE);
+
+
 
     }
 

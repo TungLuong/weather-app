@@ -12,4 +12,12 @@
     <string name="open_location_settings">Setting</string>
     <string name="cancel">Cancel</string>
     <string name="gps_network_enabled">GPS Network enable</string>
+    <string name="Humidity">Humidity</string>
+    <string name="Pressure">Pressure</string>
+    <string name="WindSpeed">Wind Speed</string>
+    <string name="DewPoint">Dew Point</string>
+    <string name="CloudCover">Cloud Cover</string>
+    <string name="UVIndex">UV Index</string>
+    <string name="Visibility">Visibility</string>
+    <string name="Ozone">Ozone</string>
 </resources>
