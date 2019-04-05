@@ -107,7 +107,7 @@ public class ModelNetwork {
         listWeatherResults = new ArrayList<>();
         for (int i = 0; i < totalAddress; i++) {
             listWeatherResults.add(null);
-            int addressId = sharedPreferences.getInt(SHARE_PREF_ADDRESS_ID_KEY_AT + i, -1);
+            int addressId = sharedPreferences.getInt(SHARE_PREF_ADDRESS_ID_KEY_AT + i, CURRENT_ADDRESS_ID);
             updateInformationByAddressId(addressId, UPDATE_ALL_WIDGET);
         }
     }
