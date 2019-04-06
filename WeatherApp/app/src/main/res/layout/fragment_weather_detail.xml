@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/display"
     >
 
     <!--<android.support.v4.widget.ContentLoadingProgressBar-->
@@ -20,6 +21,7 @@
         android:layout_height="match_parent"
         android:scaleType="fitXY"/>
     <RelativeLayout
+        android:visibility="visible"
         android:id="@+id/space"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
@@ -43,6 +45,7 @@
             android:fillViewport="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
             <LinearLayout
+                android:id="@+id/ll"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -64,7 +67,7 @@
                         android:id="@+id/tv_city_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="25dp"
+                        android:paddingTop="25dp"
                         android:gravity="center_horizontal"
                         android:text="Ha Noi"
                         android:textColor="@color/white"
@@ -92,7 +95,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="0dp"
+                        android:paddingTop="00dp"
                         android:text="20 C"
                         android:textColor="@color/white"
                         android:textSize="70sp"
@@ -103,7 +106,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="10dp"
+                        android:paddingTop="10dp"
                         android:text="25/08/1998"
                         android:textColor="@color/white"
                         android:textSize="18sp"
@@ -141,29 +144,33 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/linear"
+                    android:id="@+id/linear_layout_4"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1">
+                    android:layout_height="match_parent">
 
                     <ScrollView
                         android:nestedScrollingEnabled="true"
                         android:id="@+id/scrollView_2"
                         android:layout_width="match_parent"
-                        android:layout_height="350dp">
+                        android:layout_height="wrap_content"
+                         android:fillViewport="true">
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:orientation="vertical">
 
                             <android.support.v7.widget.RecyclerView
+                                android:nestedScrollingEnabled="false"
                                 android:id="@+id/rcv_daily"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+                                android:layout_height="400dp"
+                                ></android.support.v7.widget.RecyclerView>
                             <android.support.v7.widget.RecyclerView
+                                android:nestedScrollingEnabled="false"
                                 android:id="@+id/rcv_attribute_weather"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+                                android:layout_height="0dp"
+                                ></android.support.v7.widget.RecyclerView>
                         </LinearLayout>
                     </ScrollView>
                 </LinearLayout>

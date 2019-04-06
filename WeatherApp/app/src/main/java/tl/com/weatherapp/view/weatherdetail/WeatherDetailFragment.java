@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,13 +15,16 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
@@ -53,7 +57,8 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
     private RecyclerView rcvDaily, rcvHourly,rcvAttributeWeather;
     private NestedScrollView scrollView1;
     private ScrollView scrollView2;
-    private LinearLayout linearLayout;
+    private LinearLayout mLinearLayout4;
+    private  RelativeLayout space;
     private LinearLayout weatherPanel;
     //private ProgressBar loading;
     private ImageView background;
@@ -123,6 +128,7 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         rcvHourly = view.findViewById(R.id.rcv_hourly);
         rcvAttributeWeather = view.findViewById(R.id.rcv_attribute_weather);
 
+
         mLinerLayout1 = view.findViewById(R.id.liner_layout_1);
         mLinerLayout2 = view.findViewById(R.id.liner_layout_2);
         mLinerLayour3 = view.findViewById(R.id.liner_layout_3);
@@ -137,11 +143,15 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         scrollView1 = view.findViewById(R.id.scrollView_1);
         //scrollView1.setVisibility(View.INVISIBLE);
         scrollView2 = view.findViewById(R.id.scrollView_2);
-        linearLayout = view.findViewById(R.id.linear);
+        mLinearLayout4 = view.findViewById(R.id.linear_layout_4);
         scrollView1.setOnScrollChangeListener(this);
 
         scrollView2.setOnScrollChangeListener(this);
+        space = view.findViewById(R.id.space);
 
+        setHeightForRecycleViewAttributeWeather(inflater,container);
+
+        setHeightForScrollView2();
         refreshLayout = view.findViewById(R.id.refresh_layout);
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -157,8 +167,21 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
             getWeatherInfo(weatherResult);
         }
         refreshLayout.setRefreshing(false);
-        scrollView();
+       // scrollView();
         return view;
+    }
+
+    private void setHeightForRecycleViewAttributeWeather(LayoutInflater inflater, ViewGroup container) {
+        View itemView = inflater.inflate(R.layout.item_attribute_weather,container,false);
+        rcvAttributeWeather.getLayoutParams().height = Common.TOTAL_ATTRIBUTE_WEATHER*itemView.findViewById(R.id.item_view).getLayoutParams().height;
+    }
+
+    private void setHeightForScrollView2() {
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        int height = display.getHeight();
+        int scrollViewHeight2 = 0;
+        scrollViewHeight2 = (int) (height  - mLinerLayout1.getLayoutParams().height - mLinerLayour3.getLayoutParams().height - 1.57*space.getLayoutParams().height);
+        scrollView2.getLayoutParams().height = scrollViewHeight2  ;
     }
 
     private void scrollView() {
@@ -202,7 +225,7 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         ItemDailyWeatherAdapter itemDailyWeatherAdapter = new ItemDailyWeatherAdapter(weatherResult);
         rcvDaily.setLayoutManager(layoutManager2);
         rcvDaily.setAdapter(itemDailyWeatherAdapter);
-        rcvDaily.setNestedScrollingEnabled(false);
+        //rcvDaily.setNestedScrollingEnabled(false);
 
         // load information
         if (weatherResult.getAddress() == null) {
@@ -224,7 +247,7 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         ItemAttributeWeatherAdapter itemAttributeWeatherAdapter = new ItemAttributeWeatherAdapter(list);
         LinearLayoutManager layoutManager3 = new LinearLayoutManager(getContext());
         layoutManager3.setOrientation(LinearLayoutManager.VERTICAL);
-        rcvAttributeWeather.setNestedScrollingEnabled(false);
+        //rcvAttributeWeather.setNestedScrollingEnabled(false);
         rcvAttributeWeather.setLayoutManager(layoutManager3);
         rcvAttributeWeather.setAdapter(itemAttributeWeatherAdapter);
 
@@ -267,11 +290,11 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
 
                 alphaLinerLayout2 = 20.0f / (scrollY + 1) - 0.25f;
                 mLinerLayout2.setAlpha(alphaLinerLayout2);
-                linearLayout.setY(Math.max(mLinerLayout1.getHeight() + mLinerLayour3.getHeight() + scrollY
+                mLinearLayout4.setY(Math.max(mLinerLayout1.getHeight() + mLinerLayour3.getHeight() + scrollY
                         , mLinerLayout1.getHeight() + mLinerLayout2.getHeight() + mLinerLayour3.getHeight() - scrollY));
                 break;
             case R.id.scrollView_2:
-                if (mLinerLayour3.getY() > mLinerLayout1.getHeight() + mLinerLayout1.getY()) {
+                if (scrollView1.canScrollVertically(1)){
                     scrollView2.scrollTo(0, 0);
                 } else scrollView2.scrollTo(0, scrollY);
                 break;
