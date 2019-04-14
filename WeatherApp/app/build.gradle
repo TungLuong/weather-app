@@ -69,4 +69,6 @@ dependencies {
     //loading view
     implementation 'com.victor:lib:1.0.4'
 
+    implementation 'me.everything:overscroll-decor-android:1.0.4'
+
 }

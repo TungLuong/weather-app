@@ -41,9 +41,8 @@
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/scrollView_1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="wrap_content"
+            >
             <LinearLayout
                 android:id="@+id/ll"
                 android:layout_width="match_parent"
@@ -54,10 +53,13 @@
                 <LinearLayout
                     android:id="@+id/liner_layout_1"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="120dp"
                     android:orientation="vertical">
 
                     <TextView
+                        android:scrollbars="horizontal"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
                         android:scrollHorizontally="true"
                         android:singleLine="true"
                         android:ellipsize="marquee"
@@ -71,7 +73,7 @@
                         android:gravity="center_horizontal"
                         android:text="Ha Noi"
                         android:textColor="@color/white"
-                        android:textSize="30sp" />
+                        android:textSize="35sp" />
 
                     <TextView
                         android:id="@+id/tv_description"
@@ -87,9 +89,8 @@
                 <LinearLayout
                     android:id="@+id/liner_layout_2"
                     android:layout_width="match_parent"
-                    android:layout_height="130dp"
+                    android:layout_height="120dp"
                     android:orientation="vertical">
-
                     <TextView
                         android:id="@+id/tv_temperature"
                         android:layout_width="wrap_content"
@@ -101,52 +102,24 @@
                         android:textSize="70sp"
                         android:textStyle="normal" />
 
-                    <TextView
-                        android:id="@+id/tv_date_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:paddingTop="10dp"
-                        android:text="25/08/1998"
-                        android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/liner_layout_3"
-                    android:layout_width="match_parent"
-                    android:layout_height="130dp"
-                    android:orientation="vertical">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:alpha="0.5"
-                        android:background="@color/white">
-
-                    </View>
-
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/rcv_hourly"
-                        android:layout_width="match_parent"
-                        android:layout_height="126dp"
-                        android:gravity="center"
-                        android:textSize="20dp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:alpha="0.5"
-                        android:background="@color/white"></View>
+                    <!--<TextView-->
+                        <!--android:id="@+id/tv_date_time"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_gravity="center_horizontal"-->
+                        <!--android:paddingTop="10dp"-->
+                        <!--android:text="25/08/1998"-->
+                        <!--android:textColor="@color/white"-->
+                        <!--android:textSize="18sp"-->
+                        <!--android:textStyle="bold" />-->
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/linear_layout_4"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
                     <ScrollView
                         android:nestedScrollingEnabled="true"
@@ -159,18 +132,99 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
-                            <android.support.v7.widget.RecyclerView
-                                android:nestedScrollingEnabled="false"
-                                android:id="@+id/rcv_daily"
+                            <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="400dp"
-                                ></android.support.v7.widget.RecyclerView>
-                            <android.support.v7.widget.RecyclerView
-                                android:nestedScrollingEnabled="false"
-                                android:id="@+id/rcv_attribute_weather"
+                                android:layout_height="50dp"
+                                android:orientation="horizontal"
+                                android:paddingLeft="20dp"
+                                android:paddingRight="20dp"
+                                android:layout_gravity="center_horizontal"
+                                android:id="@+id/liner_layout_today">
+
+                                <TextView
+                                    android:id="@+id/tv_day"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="3"
+                                    android:alpha="0.9"
+                                    android:gravity="center_vertical"
+                                    android:text="Monday"
+                                    android:textColor="@color/white"
+                                    android:textSize="20sp" />
+
+                                <TextView
+                                    android:layout_marginRight="50dp"
+                                    android:layout_width="100dp"
+                                    android:layout_height="match_parent"
+                                    android:alpha="0.5"
+                                    android:gravity="center_vertical"
+                                    android:text="Today"
+                                    android:textColor="@color/white"
+                                    android:textSize="20sp" />
+
+                                <TextView
+                                    android:id="@+id/tv_temp_max"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:alpha="0.9"
+                                    android:gravity="center_vertical"
+                                    android:text="10"
+                                    android:textColor="@color/white"
+                                    android:textSize="20sp" />
+
+                                <TextView
+                                    android:layout_marginLeft="10dp"
+                                    android:id="@+id/tv_temp_min"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:alpha="0.5"
+                                    android:gravity="center_vertical"
+                                    android:text="10"
+                                    android:textColor="@color/white"
+                                    android:textSize="20sp" />
+                            </LinearLayout>
+                            <View
+                                android:id="@+id/view_line"
                                 android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                ></android.support.v7.widget.RecyclerView>
+                                android:layout_height="1dp"
+                                android:alpha="0.5"
+                                android:background="@color/white">
+                            </View>
+
+                            <LinearLayout
+                                android:id="@+id/liner_layout_3"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <android.support.v7.widget.RecyclerView
+                                    android:id="@+id/rcv_hourly"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="126dp"
+                                    android:gravity="center"
+                                    android:textSize="20dp" />
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:alpha="0.5"
+                                    android:background="@color/white"></View>
+                                <android.support.v7.widget.RecyclerView
+                                    android:nestedScrollingEnabled="false"
+                                    android:id="@+id/rcv_daily"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="350dp"
+                                    ></android.support.v7.widget.RecyclerView>
+                                <android.support.v7.widget.RecyclerView
+                                    android:nestedScrollingEnabled="false"
+                                    android:id="@+id/rcv_attribute_weather"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    ></android.support.v7.widget.RecyclerView>
+
+                            </LinearLayout>
                         </LinearLayout>
                     </ScrollView>
                 </LinearLayout>

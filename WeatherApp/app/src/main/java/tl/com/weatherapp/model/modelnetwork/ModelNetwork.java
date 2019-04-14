@@ -32,6 +32,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -142,7 +143,7 @@ public class ModelNetwork {
                             editor.putString(Common.SHARE_PREF_WEATHER_KEY_AT + addressId, strWeatherResult);
                             editor.commit();
                             listWeatherResults.set(position, weatherResult);
-                            if (!isMainActivityReceiver && position == curPositionPager) {
+                            if (!isMainActivityReceiver && dataOnReady()) {
                                 isMainActivityReceiver = true;
                                 iMainPresenter.loadDataFinish();
                             }
@@ -169,7 +170,7 @@ public class ModelNetwork {
                         String strWeatherResult = sharedPreferences.getString(Common.SHARE_PREF_WEATHER_KEY_AT + addressId, "");
                         WeatherResult weatherResult = gson.fromJson(strWeatherResult, WeatherResult.class);
                         listWeatherResults.set(position, weatherResult);
-                        if (position == curPositionPager) {
+                        if (dataOnReady()) {
                             //isMainActivityReceiver = true;
                             iMainPresenter.loadDataFinish();
                         }
@@ -250,6 +251,13 @@ public class ModelNetwork {
 //        asyncGetWeatherResult.execute(link.toString());
 
 
+    }
+
+    private boolean dataOnReady() {
+        for (WeatherResult weatherResult : listWeatherResults){
+            if (weatherResult == null) return false;
+        }
+        return true;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -348,8 +356,8 @@ public class ModelNetwork {
             int newAddressId = sharedPreferences.getInt(Common.SHARE_PREF_ADDRESS_ID_KEY_AT + (i + 1), -1);
             editor.putInt(Common.SHARE_PREF_ADDRESS_ID_KEY_AT + i, newAddressId);
         }
-        int totalAddress = sharedPreferences.getInt(Common.SHARE_PREF_TOTAL_ADDRESS_KEY, 1);
-        editor.putInt(Common.SHARE_PREF_TOTAL_ADDRESS_KEY, totalAddress - 1);
+         totalAddress--;
+        editor.putInt(Common.SHARE_PREF_TOTAL_ADDRESS_KEY, totalAddress);
         editor.commit();
 
 //        editor = sharedPreferences.edit();
@@ -384,6 +392,16 @@ public class ModelNetwork {
             editor.putInt(Common.SHARE_PREF_ADDRESS_ID_KEY_AT + newPo, addressId);
         }
         editor.commit();
+//        if (fromPosition < toPosition) {
+//            for (int i = fromPosition; i < toPosition; i++) {
+//                Collections.swap(listWeatherResults, i, i + 1);
+//            }
+//        } else {
+//            for (int i = fromPosition; i > toPosition; i--) {
+//                Collections.swap(listWeatherResults, i, i - 1);
+//            }
+//        }
+
     }
 
     public void addAddress(Place place) {
@@ -508,6 +526,7 @@ public class ModelNetwork {
                     }
                 });
             } catch (final Exception e) {
+                Toast.makeText(mContext,e.getMessage(),Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -517,10 +536,10 @@ public class ModelNetwork {
             try {
                 List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
                 if (addresses.size() > 0) {
-                    if (addresses.get(0).getLocality() == null) {
+                    if (addresses.get(0).getSubAdminArea() == null) {
                         return "unknown";
                     }
-                    return addresses.get(0).getLocality();
+                    return addresses.get(0).getSubAdminArea();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

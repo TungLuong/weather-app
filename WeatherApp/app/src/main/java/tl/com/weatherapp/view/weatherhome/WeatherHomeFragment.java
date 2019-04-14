@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import java.util.List;
 
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 import me.relex.circleindicator.CircleIndicator;
 import tl.com.weatherapp.R;
 import tl.com.weatherapp.adapter.WeatherFragmentAdapter;
@@ -84,6 +85,7 @@ public class WeatherHomeFragment extends BaseFragment implements IWeatherHomeVie
         adapter = new WeatherFragmentAdapter(getChildFragmentManager());
         adapter.setWeatherResultList(weatherResults);
         viewPager.setAdapter(adapter);
+       // OverScrollDecoratorHelper.setUpOverScroll(viewPager);
         indicator.setViewPager(viewPager);
         adapter.registerDataSetObserver(indicator.getDataSetObserver());
        // viewPager.setCurrentItem(curPositionPager);

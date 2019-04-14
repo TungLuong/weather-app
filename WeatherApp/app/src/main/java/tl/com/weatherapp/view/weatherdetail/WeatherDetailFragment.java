@@ -5,7 +5,6 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
@@ -32,6 +30,8 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.everything.android.ui.overscroll.IOverScrollDecor;
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 import tl.com.weatherapp.R;
 import tl.com.weatherapp.adapter.ItemAttributeWeatherAdapter;
 import tl.com.weatherapp.adapter.ItemDailyWeatherAdapter;
@@ -40,8 +40,6 @@ import tl.com.weatherapp.common.Common;
 import tl.com.weatherapp.model.AttributeWeather;
 import tl.com.weatherapp.model.WeatherResult;
 import tl.com.weatherapp.presenter.weatherdetail.WeatherDetailPresenter;
-
-import static tl.com.weatherapp.common.Common.convertUnixToDate;
 
 
 @TargetApi(Build.VERSION_CODES.M)
@@ -53,13 +51,15 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
     private RoundedImageView imgWeather;
     private ImageView iconWeather;
     private TextView tvCityName, tvHumidity, tvPressure, tvTemperature, tvDateTime, tvWindSpeed, tvDescription, tvDewPoint, tvCloudCover, tvUVIndex, tvVisibility, tvOzone;
-    private LinearLayout mLinerLayout1, mLinerLayout2, mLinerLayour3;
+    private TextView tvDay, tvTempMax, tvTempMin;
+    private LinearLayout mLinerLayout1, mLinerLayout2, mLinerLayour3,mLinearLayoutToday;
     private RecyclerView rcvDaily, rcvHourly,rcvAttributeWeather;
     private NestedScrollView scrollView1;
     private ScrollView scrollView2;
     private LinearLayout mLinearLayout4;
     private  RelativeLayout space;
     private LinearLayout weatherPanel;
+    private View viewLine;
     //private ProgressBar loading;
     private ImageView background;
 
@@ -69,8 +69,10 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
 
     private WeatherResult weatherResult;
     private int countAddress;
-    private float alphaLinerLayout2 = 1.0f;
+    private float alpha = 1.0f;
     private WeatherDetailPresenter presenter;
+
+    IOverScrollDecor decor;
 
     public WeatherDetailFragment() {
     }
@@ -112,10 +114,14 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         // loading = view.findViewById(R.id.loading);
         background = view.findViewById(R.id.background_image_view);
         tvCityName = view.findViewById(R.id.tv_city_name);
+        tvCityName.setSelected(true);
 //        tvHumidity = view.findViewById(R.id.tv_humidity);
 //        tvPressure = view.findViewById(R.id.tv_pressure);
         tvTemperature = view.findViewById(R.id.tv_temperature);
-        tvDateTime = view.findViewById(R.id.tv_date_time);
+        //tvDateTime = view.findViewById(R.id.tv_date_time);
+        tvDay = view.findViewById(R.id.tv_day);
+        tvTempMax = view.findViewById(R.id.tv_temp_max);
+        tvTempMin = view.findViewById(R.id.tv_temp_min);
        // tvWindSpeed = view.findViewById(R.id.tv_windSpeed);
         tvDescription = view.findViewById(R.id.tv_description);
 //        tvDewPoint = view.findViewById(R.id.tv_dewPoint);
@@ -123,6 +129,7 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
 //        tvUVIndex = view.findViewById(R.id.tv_uvIndex);
 //        tvVisibility = view.findViewById(R.id.tv_visibility);
 //        tvOzone = view.findViewById(R.id.tv_ozone);
+        viewLine = view.findViewById(R.id.view_line);
 
         rcvDaily = view.findViewById(R.id.rcv_daily);
         rcvHourly = view.findViewById(R.id.rcv_hourly);
@@ -132,6 +139,7 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         mLinerLayout1 = view.findViewById(R.id.liner_layout_1);
         mLinerLayout2 = view.findViewById(R.id.liner_layout_2);
         mLinerLayour3 = view.findViewById(R.id.liner_layout_3);
+        mLinearLayoutToday = view.findViewById(R.id.liner_layout_today);
 //        listView = findViewById(R.id.list_item);
 //        List<String> modelList = new ArrayList<>();
 //        for (int i = 0; i < 5; i++) {
@@ -141,10 +149,15 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
 //        ArrayAdapter adapter = new ArrayAdapter(this, R.layout.item_view, modelList);
 //        listView.setAdapter(adapter);
         scrollView1 = view.findViewById(R.id.scrollView_1);
+        scrollView1.setOverScrollMode(View.OVER_SCROLL_NEVER);
+       // scrollView2.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
         //scrollView1.setVisibility(View.INVISIBLE);
         scrollView2 = view.findViewById(R.id.scrollView_2);
         mLinearLayout4 = view.findViewById(R.id.linear_layout_4);
         scrollView1.setOnScrollChangeListener(this);
+        scrollView1.setSmoothScrollingEnabled(true);
+        decor = OverScrollDecoratorHelper.setUpOverScroll(scrollView2);
+        decor.detach();
 
         scrollView2.setOnScrollChangeListener(this);
         space = view.findViewById(R.id.space);
@@ -167,7 +180,6 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
             getWeatherInfo(weatherResult);
         }
         refreshLayout.setRefreshing(false);
-       // scrollView();
         return view;
     }
 
@@ -180,13 +192,10 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         int height = display.getHeight();
         int scrollViewHeight2 = 0;
-        scrollViewHeight2 = (int) (height  - mLinerLayout1.getLayoutParams().height - mLinerLayour3.getLayoutParams().height - 1.57*space.getLayoutParams().height);
+        scrollViewHeight2 = (int) (height  - mLinerLayout1.getLayoutParams().height - 1.57*space.getLayoutParams().height);
         scrollView2.getLayoutParams().height = scrollViewHeight2  ;
     }
 
-    private void scrollView() {
-        scrollView1.smoothScrollBy(0,0);
-    }
 
     @Override
     public void onResume() {
@@ -218,7 +227,7 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         ItemHourlyWeatherAdapter itemHourlyWeatherAdapter = new ItemHourlyWeatherAdapter(weatherResult);
         rcvHourly.setLayoutManager(layoutManager);
         rcvHourly.setAdapter(itemHourlyWeatherAdapter);
-
+        OverScrollDecoratorHelper.setUpOverScroll(rcvHourly,OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
         //set RecyclerView Daily
         LinearLayoutManager layoutManager2 = new LinearLayoutManager(getContext());
         layoutManager2.setOrientation(LinearLayoutManager.VERTICAL);
@@ -252,7 +261,10 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         rcvAttributeWeather.setAdapter(itemAttributeWeatherAdapter);
 
 
-        tvDateTime.setText(convertUnixToDate(weatherResult.getCurrently().getTime()) + "");
+       // tvDateTime.setText(convertUnixToDate(weatherResult.getCurrently().getTime()) + "");
+        tvDay.setText(Common.convertUnixToDay(weatherResult.getCurrently().getTime()));
+        tvTempMax.setText(Common.covertFtoC(weatherResult.getDaily().getData().get(0).getApparentTemperatureMax()) + "°");
+        tvTempMin.setText(Common.covertFtoC(weatherResult.getDaily().getData().get(0).getTemperatureLow()) + "°");
        // tvHumidity.setText(weatherResult.getCurrently().getHumidity() * 100 + "%");
        // tvPressure.setText(new StringBuilder(String.valueOf(weatherResult.getCurrently().getPressure())).append(" hPa"));
         tvTemperature.setText(new StringBuilder(String.valueOf(Common.covertFtoC(weatherResult.getCurrently().getTemperature()))).append("˚"));
@@ -286,17 +298,32 @@ public class WeatherDetailFragment extends Fragment implements View.OnScrollChan
         switch (v.getId()) {
             case R.id.scrollView_1:
                 mLinerLayout1.setY(Math.max(0, scrollY));
-                mLinerLayour3.setY(Math.max(mLinerLayout1.getHeight() + scrollY, mLinerLayout1.getHeight() + mLinerLayout2.getHeight() - scrollY));
+          //      mLinerLayour3.setY(Math.max(mLinerLayout1.getHeight() + scrollY, mLinerLayout1.getHeight() + mLinerLayout2.getHeight() - scrollY));
 
-                alphaLinerLayout2 = 20.0f / (scrollY + 1) - 0.25f;
-                mLinerLayout2.setAlpha(alphaLinerLayout2);
-                mLinearLayout4.setY(Math.max(mLinerLayout1.getHeight() + mLinerLayour3.getHeight() + scrollY
-                        , mLinerLayout1.getHeight() + mLinerLayout2.getHeight() + mLinerLayour3.getHeight() - scrollY));
+                alpha = 20.0f / (scrollY + 1) - 0.1f;
+                mLinerLayout2.setAlpha(alpha);
+                mLinearLayoutToday.setAlpha(alpha);
+//                mLinearLayout4.setY(Math.max(mLinerLayout1.getHeight() + mLinerLayour3.getHeight() + scrollY
+//                        , mLinerLayout1.getHeight() + mLinerLayout2.getHeight() + mLinerLayour3.getHeight() - scrollY));
+                mLinearLayout4.setY(Math.max(mLinerLayout1.getHeight() + scrollY
+                        , mLinerLayout1.getHeight() + mLinerLayout2.getHeight() + - scrollY));
+                if (mLinearLayout4.getY() == mLinerLayout1.getHeight() + mLinerLayout2.getHeight() ) {
+                    decor = OverScrollDecoratorHelper.setUpOverScroll(scrollView2);
+                }
                 break;
             case R.id.scrollView_2:
+                viewLine.setY(Math.max(scrollY,mLinearLayoutToday.getHeight()));
+               // viewLine.setY(Math.max(mLinearLayoutToday.getHeight(),scrollY+mLinearLayoutToday.getHeight()));
+               // mLinearLayoutToday.setY(Math.max(mLinearLayoutToday.getHeight(),scrollY+mLinearLayoutToday.getHeight()));
+                decor.detach();
                 if (scrollView1.canScrollVertically(1)){
                     scrollView2.scrollTo(0, 0);
-                } else scrollView2.scrollTo(0, scrollY);
+                } else{
+                    if (scrollY > 0){
+                       decor =  OverScrollDecoratorHelper.setUpOverScroll(scrollView2);
+                    }
+                    scrollView2.scrollTo(0, scrollY);
+                }
                 break;
 
         }

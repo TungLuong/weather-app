@@ -15,6 +15,9 @@ import com.daimajia.swipe.util.Attributes;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
+import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorator;
+import me.everything.android.ui.overscroll.adapters.RecyclerViewOverScrollDecorAdapter;
 import tl.com.weatherapp.IListenerWeatherAddressAdapter;
 import tl.com.weatherapp.R;
 import tl.com.weatherapp.adapter.ItemWeatherAddressAdapter;
@@ -62,8 +65,26 @@ public class WeatherAddressFragment extends BaseFragment implements IWeatherAddr
     }
 
     private ItemTouchHelper.Callback createCallBack() {
-        ItemTouchHelper.SimpleCallback simpleCallback;
-        simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+        ItemTouchHelper.Callback myCallback;
+        myCallback = new ItemTouchHelper.Callback() {
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true;
+            }
+
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+                return false;
+            }
+
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+                return makeMovementFlags(dragFlags, 0);
+            }
+
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 int oldPo = viewHolder.getAdapterPosition();
@@ -79,7 +100,7 @@ public class WeatherAddressFragment extends BaseFragment implements IWeatherAddr
 
             }
         };
-        return simpleCallback;
+        return myCallback;
     }
 
     @Override
@@ -116,9 +137,12 @@ public class WeatherAddressFragment extends BaseFragment implements IWeatherAddr
         addressAdapter = new ItemWeatherAddressAdapter(weatherResults, getContext(), this);
         //     ((ItemWeatherAddressAdapter) addressAdapter).setMode(Attributes.Mode.Single);
         rcvWeatherAddress.setAdapter(addressAdapter);
-
-        ItemTouchHelper helper = new ItemTouchHelper(createCallBack());
-        helper.attachToRecyclerView(rcvWeatherAddress);
+        //OverScrollDecoratorHelper.setUpOverScroll(rcvWeatherAddress,OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
+        ItemTouchHelper.Callback myCallback = createCallBack();
+        //ItemTouchHelper helper = new ItemTouchHelper(myCallback);
+        //helper.attachToRecyclerView(rcvWeatherAddress);
+        rcvWeatherAddress.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        new VerticalOverScrollBounceEffectDecorator(new RecyclerViewOverScrollDecorAdapter(rcvWeatherAddress, myCallback));
     }
 
     @Override

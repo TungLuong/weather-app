@@ -57,7 +57,7 @@ public class ItemHourlyWeatherAdapter extends RecyclerView.Adapter<ItemHourlyWea
     @Override
     public int getItemCount() {
         if(forecastWeatherResult.getHourly() == null) return 0;
-        else return forecastWeatherResult.getHourly().getData().size();
+        else return forecastWeatherResult.getHourly().getData().size() > 25 ? 25 : forecastWeatherResult.getHourly().getData().size()  ;
     }
 
     public class ItemHourlyViewHolder extends RecyclerView.ViewHolder{

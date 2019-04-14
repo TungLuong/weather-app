@@ -46,6 +46,7 @@
             android:layout_height="12dp"
             android:src="@drawable/ic_location_white_24dp" />
         <TextView
+            android:singleLine="true"
             android:layout_marginLeft="5dp"
             android:textColor="@color/white"
             android:layout_width="wrap_content"

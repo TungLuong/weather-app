@@ -36,6 +36,7 @@ public class ItemDailyWeatherAdapter extends RecyclerView.Adapter<ItemDailyWeath
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(ItemDailyViewHolder holder, int position) {
+        position = position + 1;
         holder.tvDay.setText(Common.convertUnixToDay(forecastWeatherResult.getDaily().getData().get(position).getTime()));
         holder.tvTempMax.setText(Common.covertFtoC(forecastWeatherResult.getDaily().getData().get(position).getTemperatureHigh()) + "°");
         holder.tvTempMin.setText(Common.covertFtoC(forecastWeatherResult.getDaily().getData().get(position).getTemperatureLow()) + "°");
@@ -47,7 +48,7 @@ public class ItemDailyWeatherAdapter extends RecyclerView.Adapter<ItemDailyWeath
     @Override
     public int getItemCount() {
         if (forecastWeatherResult.getDaily() == null) return 0;
-        else return forecastWeatherResult.getDaily().getData().size();
+        else return forecastWeatherResult.getDaily().getData().size() - 1;
     }
 
     public class ItemDailyViewHolder extends RecyclerView.ViewHolder {
